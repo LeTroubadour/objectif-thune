@@ -10,8 +10,8 @@ body {
     gap: 20px;
   }
   
-  /* Sidebar on the left */
-  .sidebar {
+  /* Dashboard */
+  .dashboard {
     width: 20%;
     background: #ffffff;
     padding: 20px;
@@ -19,7 +19,7 @@ body {
     border-radius: 5px;
   }
   
-  .sidebar h2 {
+  .dashboard h2 {
     margin-top: 0;
     font-size: 1.2em;
   }
