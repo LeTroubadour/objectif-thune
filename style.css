@@ -48,7 +48,7 @@ body {
     margin: 20px 0;
   }
   
-  #invest-button {
+  #invest-button, #withdraw-button {
     background: #2ecc71;
     color: #fff;
     padding: 10px 15px;
@@ -57,7 +57,7 @@ body {
     cursor: pointer;
   }
   
-  #invest-button:hover {
+  #invest-button:hover, #withdraw-button:hover {
     background: #27ae60;
   }
   
