@@ -5,7 +5,8 @@ let livretA = 0;
 let obligations = 0;
 let actions = 0;
 
-let currentYear = 1;      // Année courante
+let currentMonthIndex = 0; // 0 = first month
+let currentYearIndex = 1;      // 0 = first year
 const totalYears = 40;    // Durée de la partie en années
 
 // Get references to the DOM elements
@@ -28,7 +29,7 @@ const totalWealthEl = document.getElementById('total-wealth');
 
 // Update the UI to reflect current amounts
 function updateUI() {
-  currentYearEl.textContent = `Année ${currentYear} sur ${totalYears}`;
+  currentYearEl.textContent = `Année ${currentYearIndex} sur ${totalYears}`;
   availableMoneyEl.textContent = `${availableMoney} €`;
   const totalWealth = availableMoney + livretA + obligations + actions;
   totalWealthEl.textContent = `${totalWealth} €`;
@@ -50,8 +51,8 @@ function updateUI() {
 // Simulate a monthly increment in available money
 setInterval(() => {
   availableMoney += 100;
-  if (currentYear < totalYears) {
-    currentYear++;
+  if (currentYearIndex < totalYears) {
+    currentYearIndex++;
   }
   updateUI();
 }, 5000); // Every 5 seconds
