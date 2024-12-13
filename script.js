@@ -126,7 +126,7 @@ setInterval(() => {
   if (currentMonthIndex < (totalYears * 12)) {
     currentMonthIndex++;
   }
-  currentYear = Math.floor(currentMonthIndex / 12) + 1; 
+  currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
 
   // Add monthly income
   availableMoney += 100; 
