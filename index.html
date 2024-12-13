@@ -9,24 +9,46 @@
 <body>
 
   <div class="container">
-    <!-- Dashboard -->
+    <!-- Dashboard on the left -->
     <div class="dashboard">
-      <h2><div id="current-year">Année X sur Y</div></h2>
-
-      <h2>Argent à investir</h2>
+      <h2>Argent Disponible</h2>
       <div id="available-money">0 €</div>
-
+  
       <h2>Patrimoine Total</h2>
       <div id="total-wealth">0 €</div>
+  
+      <div id="current-year">Année X sur Y</div>
+    </div>
+  
+    <!-- Modules on the right -->
+    <div class="modules-container">
+
+      <!-- Module livret A -->
+      <div class="livret-a-module">
+        <h2>Livret A</h2>
+        <div id="livret-a-amount">0 € investis</div>
+        <button id="invest-button-livretA" class="action-button">Investir</button>
+        <button id="withdraw-button-livretA" class="action-button">Retirer</button>
+      </div>
+
+      <!-- Module obligations -->
+      <div class="obligations-module">
+        <h2>Obligations</h2>
+        <div id="obligations-amount">0 € investis</div>
+        <button id="invest-button-obligations" class="action-button">Investir</button>
+        <button id="withdraw-button-obligations" class="action-button">Retirer</button>
+      </div>
+
+        <!-- Module actions (ETF) -->
+      <div class="actions-module">
+        <h2>Actions</h2>
+        <div id="actions-amount">0 € investis</div>
+        <button id="invest-button-actions" class="action-button">Investir</button>
+        <button id="withdraw-button-actions" class="action-button">Retirer</button>
+      </div>
+
     </div>
 
-    <!-- Livret A Module -->
-    <div class="livret-a-module">
-      <h2>Livret A</h2>
-      <div id="livret-a-amount">0 € investis</div>
-      <button id="invest-button">Investir</button>
-      <button id="withdraw-button">Retirer</button>
-    </div>
   </div>
 
   <script src="script.js"></script>
