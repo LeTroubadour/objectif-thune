@@ -30,7 +30,7 @@ const totalWealthEl = document.getElementById('total-wealth');
 function updateUI() {
   currentYearEl.textContent = `Année ${currentYear} sur ${totalYears}`;
   availableMoneyEl.textContent = `${availableMoney} €`;
-  const totalWealth = availableMoney + livretA + obligations;
+  const totalWealth = availableMoney + livretA + obligations + actions;
   totalWealthEl.textContent = `${totalWealth} €`;
 
   livretAEl.textContent = `${livretA} € investis`;
