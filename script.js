@@ -3,6 +3,7 @@ let availableMoney = 1000; // starting available money
 
 let livretA = 0;
 let livretAProfit = 0;
+const MAX_LIVRET_A = 950; // Plafond d'investissement pour le Livret A et LDD en euros: 34950
 const monthlyLivretARates = [
   // 1980–1988: 96 months at 0.0070833
   0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,
@@ -84,6 +85,17 @@ function updateUI() {
   withdrawButtonLivretA.style.display = (livretA < 100) ? 'none' : 'inline-block';
   withdrawButtonObligations.style.display = (obligations < 100) ? 'none' : 'inline-block';
   withdrawButtonActions.style.display = (actions < 100) ? 'none' : 'inline-block';
+
+  // Desable invest button if threshold reached
+  if (livretA >= MAX_LIVRET_A) {
+    investButtonLivretA.disabled = true;
+    investButtonLivretA.style.background = '#95a5a6'; // Changer la couleur pour indiquer l'état désactivé
+    investButtonLivretA.style.cursor = 'pointer';
+  } else {
+    investButtonLivretA.disabled = false;
+    investButtonLivretA.style.background = '#2ecc71';
+    investButtonLivretA.style.cursor = 'pointer';
+  }
 }
 
 // Simulate a monthly increment in available money
@@ -106,6 +118,18 @@ setInterval(() => {
 // Invest in Livret A
 investButtonLivretA.addEventListener('click', () => {
   const investAmount = 100;
+  // Vérifier si le plafond est déjà atteint ou dépassé
+  if (livretA >= MAX_LIVRET_A) {
+    alert("Vous avez atteint le plafond d'investissement dans le Livret A (34 950 €).");
+    return;
+  }
+  // Vérifier si l'investissement actuel dépasserait le plafond
+  if (livretA + investAmount > MAX_LIVRET_A) {
+    const montantPossible = MAX_LIVRET_A - livretA;
+    alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
+    return;
+  }
+  // Vérifier si l'utilisateur a suffisamment d'argent disponible
   if (availableMoney >= investAmount) {
     availableMoney -= investAmount;
     livretA += investAmount;
