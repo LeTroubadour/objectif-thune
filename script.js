@@ -17,7 +17,7 @@ let livretAProfit = 0;      // Profit cumulé sur cet actif
 let actionsProfit = 0;
 let obligationsProfit = 0;
 
-const MAX_LIVRET_A = 950;   // Plafond d'investissement (34950)
+const MAX_LIVRET_A = 9950;   // Plafond d'investissement (34950)
 
 const monthlyLivretARates = convertAnnualToMonthly(yearlyLivretAReturns);   // Rendements Livret A mensualisés
 const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns); // Rendements MSCI World (1980-2019) mensualisés
@@ -32,6 +32,9 @@ const livretAProfitEl = document.getElementById('livret-a-profit');
 const livretAInvestAmountEl = document.getElementById('livretA-invest-amount');
 const investButtonLivretA = document.getElementById('invest-button-livretA');
 const withdrawButtonLivretA = document.getElementById('withdraw-button-livretA');
+const livretAModal = document.getElementById('livretA-modal');
+const livretAClose = document.getElementById('livretA-close');
+const livretAConfirmInvest = document.getElementById('livretA-confirm-invest');
 
 const obligationsEl = document.getElementById('obligations-amount');
 const investButtonObligations = document.getElementById('invest-button-obligations');
@@ -88,7 +91,7 @@ setInterval(() => {
   if (currentMonthIndex < (totalYears * 12) - 1) {
     currentMonthIndex++;
   }
-  console.log(`currentMonthIndex: ${currentMonthIndex}`);
+  //console.log(`currentMonthIndex: ${currentMonthIndex}`);
   currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
 
   availableMoney += 100; 
@@ -111,8 +114,20 @@ setInterval(() => {
 
 // Gestionnaire d'événements pour investir dans le Livret A
 investButtonLivretA.addEventListener('click', () => {
-  const investAmountInput = livretAInvestAmountEl.value; // Récupérer la valeur saisie
-  const investAmount = parseFloat(investAmountInput);
+  livretAModal.style.display = 'block';
+  livretAInvestAmountEl.value = '';
+}); // Ouvrir la modale pour définir le montant à investir
+livretAClose.addEventListener('click', () => {
+  livretAModal.style.display = 'none';
+}); // Fermer la modale lorsqu'on clique sur la croix
+window.addEventListener('click', (event) => {
+  if (event.target == livretAModal) {
+    livretAModal.style.display = 'none';
+  }
+}); // Fermer la modale lorsqu'on clique en dehors du contenu de la modale
+
+livretAConfirmInvest.addEventListener('click', () => {
+  const investAmount = parseFloat(livretAInvestAmountEl.value); // Récupérer la valeur saisie
 
   // Vérifier si la saisie est un nombre valide
   if (isNaN(investAmount) || investAmount <= 0) {
@@ -131,12 +146,12 @@ investButtonLivretA.addEventListener('click', () => {
     alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
     return;
   }
-
   // Vérifier si l'utilisateur a suffisamment d'argent disponible
   if (availableMoney >= investAmount) {
     availableMoney -= investAmount;
     livretA += investAmount;
     updateUI();
+    livretAModal.style.display = 'none';
   } else {
     alert("Pas assez d'argent disponible pour investir !");
   }
