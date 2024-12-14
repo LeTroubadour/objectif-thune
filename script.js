@@ -1,4 +1,12 @@
+// Importation des données
+import { yearlyLivretAReturns } from './livretA_rates.js';
+import { yearlyMSCIWorldReturns } from './actions_rates.js';
+
 // Initialisation des montants
+const totalYears = 40;      // Durée de la simulation en années
+let currentYearIndex = 1;   // 1 = première année
+let currentMonthIndex = 0;  // 0 = premier mois
+
 let availableMoney = 10000; // Argent à investir
 
 let livretA = 0;            // Argent investi sur cet actif
@@ -11,20 +19,8 @@ let obligationsProfit = 0;
 
 const MAX_LIVRET_A = 950;   // Plafond d'investissement (34950)
 
-const totalYears = 40;      // Durée de la simulation en années
-let currentYearIndex = 1;   // 1 = première année
-let currentMonthIndex = 0;  // 0 = premier mois
-
-// Rendements Livret A 
-const yearlyLivretAReturns = [0.0070833, 0.0070833, 0.0070833, 0.0070833,0.0070833, 0.0070833, 0.0070833, 0.0070833,0.0041667, 0.0041667, 0.0041667, 0.0041667,0.0041667, 0.0041667, 0.0041667, 0.0041667,0.0029167, 0.0029167, 0.0029167, 0.0029167,0.0029167, 0.0029167, 0.0029167, 0.0029167,0.0016667, 0.0016667, 0.0016667, 0.0016667,0.0016667, 0.0016667, 0.0016667, 0.0016667,0.000625, 0.000625, 0.000625, 0.000625,0.000625, 0.000625, 0.000625, 0.000625
-];
-const monthlyLivretARates = convertAnnualToMonthly(yearlyLivretAReturns);
-
-// Rendements MSCI World (1980-2019)
-const yearlyMSCIWorldReturns = [0.17, -0.09, 0.14, 0.17, 0.06, 0.31, 0.19, 0.05, 0.16, 0.27, -0.07, 0.17, 0.10, 0.10, 0.02, 0.17, 0.19, 0.19, 0.17, 0.19,-0.10, -0.07, -0.17, 0.27, 0.08, 0.09, 0.17,0.14, -0.40, 0.40, 0.12, -0.05, 0.15, 0.19, 0.07, -0.01, 0.09, 0.22, -0.08, 0.28, 
-];
-const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns);
-
+const monthlyLivretARates = convertAnnualToMonthly(yearlyLivretAReturns);   // Rendements Livret A mensualisés
+const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns); // Rendements MSCI World (1980-2019) mensualisés
 
 // Références aux éléments du DOM
 const currentYearEl = document.getElementById('current-year');
