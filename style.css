@@ -70,6 +70,34 @@ body {
   background: #27ae60;
 }
 
+.action-button:disabled {
+  background: #95a5a6; /* Couleur grise pour le bouton désactivé */
+  cursor: not-allowed;
+}
+
+.investment-input {
+  margin-bottom: 10px;
+}
+
+.investment-input label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.investment-input input {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.cap-message {
+  font-size: 1em;
+  margin-top: 10px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 800px) {
   .container {

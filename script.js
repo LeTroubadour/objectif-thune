@@ -1,54 +1,37 @@
-// Initialize amounts
-let availableMoney = 1000; // starting available money
+// Initialisation des montants
+let availableMoney = 10000; // Argent à investir
 
-let livretA = 0;
-let livretAProfit = 0;
-const MAX_LIVRET_A = 950; // Plafond d'investissement pour le Livret A et LDD en euros: 34950
-const monthlyLivretARates = [
-  // 1980–1988: 96 months at 0.0070833
-  0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,
-  0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,0.0070833,
-  // 1988–1996: 96 months at 0.0041667
-  0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,
-  0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,
-  0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,0.0041667,
-  // 1996–2004: 96 months at 0.0029167
-  0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,
-  0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,
-  0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,0.0029167,
-  // 2004–2012: 96 months at 0.0016667
-  0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,
-  0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,
-  0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,0.0016667,
-  // 2012–2020: 96 months at 0.000625
-  0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,
-  0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,
-  0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625,0.000625
-];
-
+let livretA = 0;            // Argent investi sur cet actif
 let obligations = 0;
-
 let actions = 0;
+
+let livretAProfit = 0;      // Profit cumulé sur cet actif
 let actionsProfit = 0;
-const monthlyActionsRates = [
-  -0.007536, -0.007536, -0.007536, -0.007536, -0.007536, -0.007536,-0.007536, -0.007536, -0.007536, -0.007536, -0.007536, -0.007536,0.011034, 0.011034, 0.011034, 0.011034, 0.011034, 0.011034,0.011034, 0.011034, 0.011034, 0.011034, 0.011034, 0.011034,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.004872, 0.004872, 0.004872, 0.004872, 0.004872, 0.004872,0.004872, 0.004872, 0.004872, 0.004872, 0.004872,
-  0.004872,  0.022839, 0.022839, 0.022839, 0.022839, 0.022839, 0.022839,0.022839, 0.022839, 0.022839, 0.022839, 0.022839, 0.022839,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,
-  0.004075, 0.004075, 0.004075, 0.004075, 0.004075, 0.004075,0.004075, 0.004075, 0.004075, 0.004075, 0.004075, 0.004075,0.01246, 0.01246, 0.01246, 0.01246, 0.01246, 0.01246,0.01246, 0.01246, 0.01246, 0.01246, 0.01246, 0.01246,0.020202, 0.020202, 0.020202, 0.020202, 0.020202, 0.020202,0.020202, 0.020202, 0.020202, 0.020202, 0.020202, 0.020202,-0.006000, -0.006000, -0.006000, -0.006000, -0.006000, -0.006000,-0.006000, -0.006000, -0.006000, -0.006000, -0.006000, -0.006000,
-  0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.007942, 0.007942, 0.007942, 0.007942, 0.007942, 0.007942,0.007942, 0.007942, 0.007942, 0.007942, 0.007942, 0.007942,0.007942, 0.007942, 0.007942, 0.007942, 0.007942, 0.007942,0.007942, 0.007942, 0.007942, 0.007942, 0.007942, 0.007942,0.001665, 0.001665, 0.001665, 0.001665, 0.001665, 0.001665,0.001665, 0.001665, 0.001665, 0.001665, 0.001665, 0.001665,
-  0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,0.013229, 0.013229, 0.013229, 0.013229, 0.013229, 0.013229,
-  0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,0.014696, 0.014696, 0.014696, 0.014696, 0.014696, 0.014696,-0.0087, -0.0087, -0.0087, -0.0087, -0.0087, -0.0087,-0.0087, -0.0087, -0.0087, -0.0087, -0.0087, -0.0087,-0.0060, -0.0060, -0.0060, -0.0060, -0.0060, -0.0060,-0.0060, -0.0060, -0.0060, -0.0060, -0.0060, -0.0060,-0.0154, -0.0154, -0.0154, -0.0154, -0.0154, -0.0154,-0.0154, -0.0154, -0.0154, -0.0154, -0.0154, -0.0154,0.020202, 0.020202, 0.020202, 0.020202, 
-  0.020202, 0.020202,0.020202, 0.020202, 0.020202, 0.020202, 0.020202, 0.020202,0.00644, 0.00644, 0.00644, 0.00644, 0.00644, 0.00644,0.00644, 0.00644, 0.00644, 0.00644, 0.00644, 0.00644,0.00721, 0.00721, 0.00721, 0.00721, 0.00721, 0.00721,0.00721, 0.00721, 0.00721, 0.00721, 0.00721, 0.00721,0.01323, 0.01323, 0.01323, 0.01323, 0.01323, 0.01323,0.01323, 0.01323, 0.01323, 0.01323, 0.01323, 0.01323,0.0110, 0.0110, 0.0110, 0.0110, 0.0110, 0.0110,0.0110, 0.0110, 0.0110, 0.0110,
-  0.0110, 0.0110,-0.0420, -0.0420, -0.0420, -0.0420, -0.0420, -0.0420,-0.0420, -0.0420, -0.0420, -0.0420, -0.0420, -0.0420,0.0284, 0.0284, 0.0284, 0.0284, 0.0284, 0.0284,0.0284, 0.0284, 0.0284, 0.0284, 0.0284, 0.0284,0.0095, 0.0095, 0.0095, 0.0095, 0.0095, 0.0095,0.0095, 0.0095, 0.0095, 0.0095, 0.0095, 0.0095,-0.00425, -0.00425, -0.00425, -0.00425, -0.00425, -0.00425,-0.00425, -0.00425, -0.00425, -0.00425, -0.00425, -0.00425,0.01178, 0.01178, 0.01178, 0.01178, 0.01178, 0.01178,0.01178, 0.01178, 0.01178, 0.01178, 0.01178, 0.01178,0.0146, 0.0146, 0.0146, 0.0146, 0.0146, 0.0146,0.0146, 0.0146, 0.0146, 0.0146, 0.0146, 0.0146,0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057,0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057,-0.000837, -0.000837, -0.000837, -0.000837, -0.000837, -0.000837,-0.000837, -0.000837, -0.000837, -0.000837, -0.000837, -0.000837,0.00721, 0.00721, 0.00721, 0.00721, 0.00721, 0.00721,0.00721, 0.00721, 0.00721, 0.00721, 0.00721, 0.00721,0.0167, 0.0167, 0.0167, 0.0167, 0.0167, 0.0167,0.0167, 0.0167, 0.0167, 0.0167, 0.0167, 0.0167,-0.0069, -0.0069, -0.0069, -0.0069, -0.0069, -0.0069,-0.0069, -0.0069, -0.0069, -0.0069, -0.0069, -0.0069,0.0208, 0.0208, 0.0208, 0.0208, 0.0208, 0.0208,0.0208, 0.0208, 0.0208, 0.0208, 0.0208, 0.0208,
+let obligationsProfit = 0
+
+const MAX_LIVRET_A = 950;   // Plafond d'investissement (34950)
+
+const totalYears = 40;      // Durée de la simulation en années
+let currentYearIndex = 1;   // 1 = première année
+let currentMonthIndex = 0;  // 0 = premier mois
+
+// Rendements Livret A 
+const yearlyLivretAReturns = [0.0070833, 0.0070833, 0.0070833, 0.0070833,0.0070833, 0.0070833, 0.0070833, 0.0070833,0.0041667, 0.0041667, 0.0041667, 0.0041667,0.0041667, 0.0041667, 0.0041667, 0.0041667,0.0029167, 0.0029167, 0.0029167, 0.0029167,0.0029167, 0.0029167, 0.0029167, 0.0029167,0.0016667, 0.0016667, 0.0016667, 0.0016667,0.0016667, 0.0016667, 0.0016667, 0.0016667,0.000625, 0.000625, 0.000625, 0.000625,0.000625, 0.000625, 0.000625, 0.000625
 ];
+const monthlyLivretARates = convertAnnualToMonthly(yearlyLivretAReturns);
 
-let currentMonthIndex = 0; // 0 = first month
-let currentYearIndex = 1;  // 1 = first year
-const totalYears = 40;    // Durée de la partie en années
+// Rendements MSCI World (1980-2019)
+const yearlyMSCIWorldReturns = [0.17, -0.09, 0.14, 0.17, 0.06, 0.31, 0.19, 0.05, 0.16, 0.27, -0.07, 0.17, 0.10, 0.10, 0.02, 0.17, 0.19, 0.19, 0.17, 0.19,-0.10, -0.07, -0.17, 0.27, 0.08, 0.09, 0.17,0.14, -0.40, 0.40, 0.12, -0.05, 0.15, 0.19, 0.07, -0.01, 0.09, 0.22, -0.08, 0.28, 
+];
+const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns);
 
-// Get references to the DOM elements
+
+// Références aux éléments du DOM
 const availableMoneyEl = document.getElementById('available-money');
 
 const livretAEl = document.getElementById('livret-a-amount');
+const livretAProfitEl = document.getElementById('livret-a-profit');
+const livretAInvestAmountEl = document.getElementById('livretA-invest-amount');
 const investButtonLivretA = document.getElementById('invest-button-livretA');
 const withdrawButtonLivretA = document.getElementById('withdraw-button-livretA');
 
@@ -57,13 +40,15 @@ const investButtonObligations = document.getElementById('invest-button-obligatio
 const withdrawButtonObligations = document.getElementById('withdraw-button-obligations');
 
 const actionsEl = document.getElementById('actions-amount');
+const actionsProfitEl = document.getElementById('actions-profit');
 const investButtonActions = document.getElementById('invest-button-actions');
 const withdrawButtonActions = document.getElementById('withdraw-button-actions');
 
 const currentYearEl = document.getElementById('current-year');
 const totalWealthEl = document.getElementById('total-wealth');
 
-// Update the UI to reflect current amounts
+
+// Mise à jour de l'interface utilisateur avec les nouvelles valeurs
 function updateUI() {
   currentYearEl.textContent = `Année ${currentYearIndex} sur ${totalYears}`;
   availableMoneyEl.textContent = `${availableMoney.toFixed(2)} €`;
@@ -72,55 +57,67 @@ function updateUI() {
   totalWealthEl.textContent = `${totalWealth.toFixed(2)} €`;
 
   livretAEl.textContent = `${livretA.toFixed(2)} € investis`;
-  const livretAProfitEl = document.getElementById('livret-a-profit');
-  livretAProfitEl.textContent = `${livretAProfit.toFixed(2)} € de profit`;
-  
   obligationsEl.textContent = `${obligations.toFixed(2)} € investis`;
-
   actionsEl.textContent = `${actions.toFixed(2)} € investis`;
-  const actionsProfitEl = document.getElementById('actions-profit');
+
+  livretAProfitEl.textContent = `${livretAProfit.toFixed(2)} € de profit`;
   actionsProfitEl.textContent = `${actionsProfit.toFixed(2)} € de profit`;
 
-  // Show/hide withdraw buttons
+  // Afficher ou masquer les boutons de retrait en fonction des montants
   withdrawButtonLivretA.style.display = (livretA < 100) ? 'none' : 'inline-block';
   withdrawButtonObligations.style.display = (obligations < 100) ? 'none' : 'inline-block';
   withdrawButtonActions.style.display = (actions < 100) ? 'none' : 'inline-block';
 
-  // Desable invest button if threshold reached
+  // Désactiver le bouton "Investir" du livret A si le plafond est atteint
   if (livretA >= MAX_LIVRET_A) {
     investButtonLivretA.disabled = true;
-    investButtonLivretA.style.background = '#95a5a6'; // Changer la couleur pour indiquer l'état désactivé
+    investButtonLivretA.style.background = '#95a5a6'; // Couleur grise pour indiquer l'état désactivé
     investButtonLivretA.style.cursor = 'pointer';
   } else {
     investButtonLivretA.disabled = false;
     investButtonLivretA.style.background = '#2ecc71';
     investButtonLivretA.style.cursor = 'pointer';
   }
+  // Afficher ou masquer le message de plafond du livret A
+  const livretACapMessageEl = document.getElementById('livret-a-cap-message');
+  if (livretA >= MAX_LIVRET_A) {
+    livretACapMessageEl.style.display = 'block';
+  } else {
+    livretACapMessageEl.style.display = 'none';
+  }
 }
 
-// Simulate a monthly increment in available money
+
+// Incrément mensuel de l'argent disponible et calcul des intérêts
 setInterval(() => {
   if (currentMonthIndex < (totalYears * 12)) {
     currentMonthIndex++;
   }
   currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
 
-  // Add monthly income
   availableMoney += 100; 
 
-  // Calculate monthly interest/gains
   calculateLivretAInterest();
   calculateActionsReturns();
 
   updateUI();
-}, 1000); // Every 5 seconds
+}, 1000); // Toutes les secondes représentent un mois
 
-// Invest in Livret A
+
+// Gestionnaire d'événements pour investir dans le Livret A
 investButtonLivretA.addEventListener('click', () => {
-  const investAmount = 100;
+  const investAmountInput = livretAInvestAmountEl.value; // Récupérer la valeur saisie
+  const investAmount = parseFloat(investAmountInput);
+
+  // Vérifier si la saisie est un nombre valide
+  if (isNaN(investAmount) || investAmount <= 0) {
+    alert("Veuillez entrer un montant valide à investir (supérieur à 0).");
+    return;
+  }
+
   // Vérifier si le plafond est déjà atteint ou dépassé
   if (livretA >= MAX_LIVRET_A) {
-    alert("Vous avez atteint le plafond d'investissement dans le Livret A (34 950 €).");
+    alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
     return;
   }
   // Vérifier si l'investissement actuel dépasserait le plafond
@@ -129,6 +126,7 @@ investButtonLivretA.addEventListener('click', () => {
     alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
     return;
   }
+
   // Vérifier si l'utilisateur a suffisamment d'argent disponible
   if (availableMoney >= investAmount) {
     availableMoney -= investAmount;
@@ -139,7 +137,7 @@ investButtonLivretA.addEventListener('click', () => {
   }
 });
 
-// Withdraw from Livret A
+// Gestionnaire d'événements pour retirer du Livret A
 withdrawButtonLivretA.addEventListener('click', () => {
   const withdrawAmount = 100;
   if (livretA >= withdrawAmount) {
@@ -158,7 +156,7 @@ function calculateLivretAInterest() {
   livretAProfit += interestEarned;
 }
 
-// Invest in Obligations
+// Gestionnaire d'événements pour investir dans les Obligations
 investButtonObligations.addEventListener('click', () => {
   const investAmount = 100;
   if (availableMoney >= investAmount) {
@@ -170,7 +168,7 @@ investButtonObligations.addEventListener('click', () => {
   }
 });
 
-// Withdraw from Obligations
+// Gestionnaire d'événements pour retirer des Obligations
 withdrawButtonObligations.addEventListener('click', () => {
   const withdrawAmount = 100;
   if (obligations >= withdrawAmount) {
@@ -182,7 +180,7 @@ withdrawButtonObligations.addEventListener('click', () => {
   }
 });
 
-// Invest in Actions
+// Gestionnaire d'événements pour investir dans les Actions
 investButtonActions.addEventListener('click', () => {
   const investAmount = 100;
   if (availableMoney >= investAmount) {
@@ -194,7 +192,7 @@ investButtonActions.addEventListener('click', () => {
   }
 });
 
-// Withdraw from Actions
+// Gestionnaire d'événements pour retirer des Actions
 withdrawButtonActions.addEventListener('click', () => {
   const withdrawAmount = 100;
   if (actions >= withdrawAmount) {
@@ -211,6 +209,18 @@ function calculateActionsReturns() {
   const interestEarned = actions * monthlyRate;
   actions += interestEarned;
   actionsProfit += interestEarned;
+}
+
+// Fonction pour convertir un tableau de rendements annuels en un tableau de rendements mensuels
+function convertAnnualToMonthly(annualReturns) {
+  const expandedMonthlyRates = [];
+  annualReturns.forEach(annual => {
+    const monthlyRate = Math.pow(1 + annual, 1 / 12) - 1;
+    for (let i = 0; i < 12; i++) {
+      expandedMonthlyRates.push(parseFloat(monthlyRate.toFixed(6)));
+    }
+  });
+  return expandedMonthlyRates;
 }
 
 // Initial UI update
