@@ -7,7 +7,7 @@ let actions = 0;
 
 let livretAProfit = 0;      // Profit cumulé sur cet actif
 let actionsProfit = 0;
-let obligationsProfit = 0
+let obligationsProfit = 0;
 
 const MAX_LIVRET_A = 950;   // Plafond d'investissement (34950)
 
@@ -27,7 +27,9 @@ const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns);
 
 
 // Références aux éléments du DOM
+const currentYearEl = document.getElementById('current-year');
 const availableMoneyEl = document.getElementById('available-money');
+const totalWealthEl = document.getElementById('total-wealth');
 
 const livretAEl = document.getElementById('livret-a-amount');
 const livretAProfitEl = document.getElementById('livret-a-profit');
@@ -43,9 +45,6 @@ const actionsEl = document.getElementById('actions-amount');
 const actionsProfitEl = document.getElementById('actions-profit');
 const investButtonActions = document.getElementById('invest-button-actions');
 const withdrawButtonActions = document.getElementById('withdraw-button-actions');
-
-const currentYearEl = document.getElementById('current-year');
-const totalWealthEl = document.getElementById('total-wealth');
 
 
 // Mise à jour de l'interface utilisateur avec les nouvelles valeurs
@@ -72,7 +71,7 @@ function updateUI() {
   if (livretA >= MAX_LIVRET_A) {
     investButtonLivretA.disabled = true;
     investButtonLivretA.style.background = '#95a5a6'; // Couleur grise pour indiquer l'état désactivé
-    investButtonLivretA.style.cursor = 'pointer';
+    investButtonLivretA.style.cursor = 'not-allowed';
   } else {
     investButtonLivretA.disabled = false;
     investButtonLivretA.style.background = '#2ecc71';
@@ -90,15 +89,25 @@ function updateUI() {
 
 // Incrément mensuel de l'argent disponible et calcul des intérêts
 setInterval(() => {
-  if (currentMonthIndex < (totalYears * 12)) {
+  if (currentMonthIndex < (totalYears * 12) - 1) {
     currentMonthIndex++;
   }
+  console.log(`currentMonthIndex: ${currentMonthIndex}`);
   currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
 
   availableMoney += 100; 
 
-  calculateLivretAInterest();
-  calculateActionsReturns();
+  // Appliquer les rendements mensuels pour Livret A
+  const livretAMonthlyRate = monthlyLivretARates[currentMonthIndex];
+  const livretAResult = applyMonthlyReturn(livretA, livretAMonthlyRate, livretAProfit);
+  livretA = livretAResult.newBalance;
+  livretAProfit = livretAResult.newProfit;
+
+  // Appliquer les rendements mensuels pour Actions
+  const actionsMonthlyRate = monthlyActionsRates[currentMonthIndex];
+  const actionsResult = applyMonthlyReturn(actions, actionsMonthlyRate, actionsProfit);
+  actions = actionsResult.newBalance;
+  actionsProfit = actionsResult.newProfit;
 
   updateUI();
 }, 1000); // Toutes les secondes représentent un mois
@@ -149,13 +158,6 @@ withdrawButtonLivretA.addEventListener('click', () => {
   }
 });
 
-function calculateLivretAInterest() {
-  const monthlyRate = monthlyLivretARates[currentMonthIndex];
-  const interestEarned = livretA * monthlyRate;
-  livretA += interestEarned;
-  livretAProfit += interestEarned;
-}
-
 // Gestionnaire d'événements pour investir dans les Obligations
 investButtonObligations.addEventListener('click', () => {
   const investAmount = 100;
@@ -204,14 +206,11 @@ withdrawButtonActions.addEventListener('click', () => {
   }
 });
 
-function calculateActionsReturns() {
-  const monthlyRate = monthlyActionsRates[currentMonthIndex];
-  const interestEarned = actions * monthlyRate;
-  actions += interestEarned;
-  actionsProfit += interestEarned;
-}
-
-// Fonction pour convertir un tableau de rendements annuels en un tableau de rendements mensuels
+/**
+ * Convertit un tableau de rendements annuels en rendements mensuels.
+ * @param {number[]} annualReturns - Tableau des rendements annuels (par exemple, [0.17, -0.09]).
+ * @returns {number[]} - Tableau des rendements mensuels, avec chaque rendement annuel converti en 12 rendements mensuels équivalents.
+ */
 function convertAnnualToMonthly(annualReturns) {
   const expandedMonthlyRates = [];
   annualReturns.forEach(annual => {
@@ -223,5 +222,19 @@ function convertAnnualToMonthly(annualReturns) {
   return expandedMonthlyRates;
 }
 
-// Initial UI update
+/**
+ * Calcule le rendement mensuel d'un investissement.
+ * @param {number} balance - Le solde actuel de l'investissement.
+ * @param {number} rate - Le taux de rendement mensuel (ex. 0.005 pour 0,5%).
+ * @param {number} profit - Le profit cumulé jusqu'à présent.
+ * @returns {Object} - Un objet contenant le nouveau solde et le nouveau profit cumulé.
+ */
+function applyMonthlyReturn(balance, rate, profit) {
+  const interestEarned = balance * rate;
+  const newBalance = balance + interestEarned;
+  const newProfit = profit + interestEarned;
+  return { newBalance, newProfit };
+}
+
+// Mise à jour initiale de l'interface utilisateur
 updateUI();
