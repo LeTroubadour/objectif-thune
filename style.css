@@ -1,3 +1,10 @@
+/* Réinitialisation des marges et paddings par défaut */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
@@ -6,27 +13,43 @@ body {
 
 .container {
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
+  height: 100vh; /* Hauteur totale de la fenêtre */
 }
 
 /* Dashboard */
 .dashboard {
-  width: 20%;
-  background: #ffffff;
+  width: 250px; /* Largeur fixe pour le dashboard */
+  background-color: #FFDAB9; /* Couleur de fond pêche */
   padding: 20px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Aligne les éléments en haut */
+  overflow-y: auto; /* Ajoute un défilement vertical si contenu dépasse */
 }
 
-.dashboard h2 {
-  margin-top: 0;
-  font-size: 1.2em;
+.dashboard-section {
+  margin-bottom: 30px;
 }
 
-#available-money, #total-wealth {
-  font-size: 1.5em;
-  margin: 20px 0;
+.dashboard-title {
+  font-size: 1.1em;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 1px;
+}
+
+.dashboard-amount {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #000;
+}
+
+.dashboard-image {
+  width: 100%; /* Adapte la largeur de l'image à celle du conteneur */
+  height: auto; /* Maintient les proportions de l'image */
+  max-width: 150px; /* Limite la largeur maximale de l'image */
+  margin: 0 auto; /* Centre l'image horizontalement */
+  display: block; /* Assure que l'image est traitée comme un bloc */
 }
 
 /* Modules container with spacing between modules */

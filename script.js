@@ -48,18 +48,23 @@ const withdrawButtonActions = document.getElementById('withdraw-button-actions')
 
 // Mise à jour de l'interface utilisateur avec les nouvelles valeurs
 function updateUI() {
-  currentYearEl.textContent = `Année ${currentYearIndex} sur ${totalYears}`;
-  availableMoneyEl.textContent = `${availableMoney.toFixed(2)} €`;
+  currentYearEl.innerHTML = `
+  <span class="dashboard-title">Année</span>
+  <span class="dashboard-amount">${currentYearIndex}</span> 
+  <span class="dashboard-title">sur</span> 
+  <span class="dashboard-amount">${totalYears}</span>
+`;
+  availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
   
   const totalWealth = availableMoney + livretA + obligations + actions;
-  totalWealthEl.textContent = `${totalWealth.toFixed(2)} €`;
+  totalWealthEl.textContent = `€${totalWealth.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
 
-  livretAEl.textContent = `${livretA.toFixed(2)} € investis`;
-  obligationsEl.textContent = `${obligations.toFixed(2)} € investis`;
-  actionsEl.textContent = `${actions.toFixed(2)} € investis`;
+  livretAEl.textContent = `€${livretA.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  obligationsEl.textContent = `€${obligations.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  actionsEl.textContent = `€${actions.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
 
-  livretAProfitEl.textContent = `${livretAProfit.toFixed(2)} € de profit`;
-  actionsProfitEl.textContent = `${actionsProfit.toFixed(2)} € de profit`;
+  livretAProfitEl.textContent = `€${livretAProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
+  actionsProfitEl.textContent = `€${actionsProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
 
   // Afficher ou masquer les boutons de retrait en fonction des montants
   withdrawButtonLivretA.style.display = (livretA < 100) ? 'none' : 'inline-block';
