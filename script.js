@@ -74,19 +74,8 @@ function updateUI() {
   // Désactiver le bouton "Investir" du livret A si le plafond est atteint
   if (livretA >= MAX_LIVRET_A) {
     investButtonLivretA.disabled = true;
-    investButtonLivretA.style.background = '#95a5a6'; // Couleur grise pour indiquer l'état désactivé
-    investButtonLivretA.style.cursor = 'not-allowed';
   } else {
     investButtonLivretA.disabled = false;
-    investButtonLivretA.style.background = '#2ecc71';
-    investButtonLivretA.style.cursor = 'pointer';
-  }
-  // Afficher ou masquer le message de plafond du livret A
-  const livretACapMessageEl = document.getElementById('livret-a-cap-message');
-  if (livretA >= MAX_LIVRET_A) {
-    livretACapMessageEl.style.display = 'block';
-  } else {
-    livretACapMessageEl.style.display = 'none';
   }
 }
 

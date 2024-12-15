@@ -1,107 +1,151 @@
-/* Réinitialisation des marges et paddings par défaut */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Paramètres de défaut */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f0f0f0;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+  }
 
-.container {
-  display: flex;
-  height: 100vh; /* Hauteur totale de la fenêtre */
-}
+/* Container global */
+
+  .container {
+    height: 100vh;                /* Hauteur totale de la fenêtre */
+    overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
+
+    display: flex;
+  }
 
 /* Dashboard */
-.dashboard {
-  width: 250px; /* Largeur fixe pour le dashboard */
-  background-color: #FFDAB9; /* Couleur de fond pêche */
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Aligne les éléments en haut */
-  overflow-y: auto; /* Ajoute un défilement vertical si contenu dépasse */
-}
 
-.dashboard-section {
-  margin-bottom: 30px;
-}
+  .dashboard {
+    width: 250px;                 /* Largeur fixe */
+    background-color: #FFDAB9;  /* Couleur de fond */
+    padding: 20px;
 
-.dashboard-title {
-  font-size: 1.1em;
-  color: #333;
-  font-weight: bold;
-  margin-bottom: 1px;
-}
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;  /* Aligne les éléments en haut */
+  }
 
-.dashboard-amount {
-  font-size: 1.4em;
-  font-weight: bold;
-  color: #000;
-}
+  .dashboard-section {
+    margin-bottom: 30px;
+  }
 
-.dashboard-image {
-  width: 100%; /* Adapte la largeur de l'image à celle du conteneur */
-  height: auto; /* Maintient les proportions de l'image */
-  max-width: 150px; /* Limite la largeur maximale de l'image */
-  margin: 0 auto; /* Centre l'image horizontalement */
-  display: block; /* Assure que l'image est traitée comme un bloc */
-}
+  .dashboard-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1px;
+  }
 
-/* Modules container with spacing between modules */
-.modules-container {
-  display: flex;
-  gap: 20px;
-  flex: 1;
-}
+  .dashboard-amount {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #000;
+  }
 
-/* Common module styles */
-.module {
-  flex: 1;
-  background: #ffffff;
-  padding: 20px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  border-radius: 5px;
-}
+  .dashboard-image {
+    width: 100%;                /* Adapte la largeur de l'image à celle du conteneur */
+    height: auto;               /* Maintient les proportions de l'image */
+    max-width: 200px;           /* Limite la largeur maximale de l'image */
+    margin: 0 auto;             /* Centre l'image horizontalement */
+    display: block;             /* Assure que l'image est traitée comme un bloc */
+  }
 
-.module h2 {
-  margin-top: 0;
-  font-size: 1.2em;
-}
+/* Section contenant les modules d'investissement */
 
-.module-amount {
-  font-size: 1.5em;
-  margin: 20px 0;
-}
+  .modules-container {
+    background-color: #777574;  /* Couleur de fond */
+    padding: 10px;
+    gap: 10px;
+
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;  /* Aligne les éléments en haut */
+  }
+
+  .module {
+    background: #ebecee;
+    color: #333;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 5px;           /* Bords arondis */
+
+    flex: 1;
+  }
+
+  .module h2 {
+    font-size: 1.2em;
+  }
+
+  .module-amount {
+    font-size: 1.3em;
+    margin: 20px 0;
+  }
 
 /* Buttons */
-.action-button {
-  background: #2ecc71;
-  color: #fff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-right: 10px;
-}
 
-.action-button:hover {
-  background: #27ae60;
-}
+  .action-button {
+    background: #2ecc71;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;         /* Bords arondis */
+    cursor: pointer;
+    margin-right: 10px;
+  }
 
-.action-button:disabled {
-  background: #95a5a6; /* Couleur grise pour le bouton désactivé */
-  cursor: not-allowed;
-}
+  .action-button:hover {
+    background: #105c2f;
+  }
 
-.cap-message {
-  font-size: 1em;
-  margin-top: 10px;
-}
+  .action-button:disabled {
+    background: #95a5a6;    /* Couleur grise pour le bouton désactivé */
+    cursor: not-allowed;
+  }
+
+  .modal-invest {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .modal-invest-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    gap: 10px;
+    border: 1px solid #888;
+    width: 350px;
+    border-radius: 8px;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .close-icon {
+    color: #420303;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:focus {
+    color: black;
+    text-decoration: none;
+  }
 
 /* Responsive adjustments */
 @media (max-width: 800px) {
@@ -117,44 +161,4 @@ body {
   .modules-container {
     flex-direction: column;
   }
-
-/* Style pour la modale */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Contenu de la modale */
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 300px;
-  border-radius: 8px;
-  position: relative;
-}
-
-/* Bouton de fermeture */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-}
-
 }

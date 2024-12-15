@@ -9,7 +9,7 @@
 <body>
 
   <div class="container">
-    <!-- Dashboard on the left -->
+    <!-- Dashboard -->
     <div class="dashboard">
       <div class="dashboard-section">
         <div id="current-year">Année X sur Y</div>
@@ -31,24 +31,19 @@
 
     </div>
 
-    <!-- Modules on the right -->
+    <!-- Modules d'investissement -->
     <div class="modules-container">
 
       <!-- Module livret A -->
-      <div class="module livret-a-module">
+      <div class="module">
         <h2>Livret A</h2>
         <div id="livret-a-amount" class="module-amount">0 € investis</div>
         <div id="livret-a-profit" class="module-amount">0 € de profit</div>
-        
-          <!-- Message de plafond -->
-        <p id="livret-a-cap-message" class="cap-message" style="display: none; color: red;">
-          Plafond d'investissement atteint (34 950 €).
-        </p>
 
         <button id="invest-button-livretA" class="action-button">Investir</button>
-        <div id="livretA-modal" class="modal">
-          <div class="modal-content">
-            <span id="livretA-close" class="close">&times;</span>
+        <div id="livretA-modal" class="modal-invest">
+          <div class="modal-invest-content">
+            <span id="livretA-close" class="close-icon">&times;</span>
             <input type="number" id="livretA-invest-amount" placeholder="Montant à investir" min="0">
             <button id="livretA-confirm-invest">Investir</button>
           </div>
@@ -58,7 +53,7 @@
       </div>
 
       <!-- Module obligations -->
-      <div class="module obligations-module">
+      <div class="module">
         <h2>Obligations</h2>
         <div id="obligations-amount" class="module-amount">0 € investis</div>
         <button id="invest-button-obligations" class="action-button">Investir</button>
@@ -66,7 +61,7 @@
       </div>
 
       <!-- Module actions (ETF) -->
-      <div class="module actions-module">
+      <div class="module">
         <h2>Actions</h2>
         <div id="actions-amount" class="module-amount">0 € investis</div>
         <div id="actions-profit" class="module-amount">0 € de profit</div>
