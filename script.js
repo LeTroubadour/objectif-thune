@@ -1,9 +1,9 @@
 // Importation des données
-import { yearlyLivretAReturns } from './livretA_rates.js';
-import { yearlyMSCIWorldReturns } from './actions_rates.js';
+import { MonthlyLivretAReturns } from './livretA_rates.js';
+import { MonthlyActionsReturns } from './actions_rates.js';
 
 // Initialisation des montants
-const totalYears = 40;      // Durée de la simulation en années
+const totalYears = 20;      // Durée de la simulation en années
 let currentYearIndex = 1;   // 1 = première année
 let currentMonthIndex = 0;  // 0 = premier mois
 
@@ -19,8 +19,31 @@ let obligationsProfit = 0;
 
 const MAX_LIVRET_A = 9950;   // Plafond d'investissement (34950)
 
-const monthlyLivretARates = convertAnnualToMonthly(yearlyLivretAReturns);   // Rendements Livret A mensualisés
-const monthlyActionsRates = convertAnnualToMonthly(yearlyMSCIWorldReturns); // Rendements MSCI World (1980-2019) mensualisés
+// Construction des tables de rendements mensualisés
+// Dates de début comprises entre 1980-01 et 2004-01 pour une partie de 20 ans et des données allant de 1980-01 à 2023-12
+const randomYear = Math.floor(Math.random() * (2004 - 1980 + 1)) + 1980;
+const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+const TARGET_START_DATE = `${randomYear}-${randomMonth}`;
+const NUMBER_OF_ENTRIES = totalYears * 12;
+    /**
+    * Finds the index of the target date in a Monthly Returns array.
+    * @param {Array} returns - Array of [date, rate] entries.
+    * @param {string} targetDate - Date string in "YYYY-MM" format.
+    * @returns {number} - Index of the target date or -1 if not found.
+    */
+    function findStartIndex(returns, targetDate) {
+      return returns.findIndex(entry => entry[0] === targetDate);
+    }
+
+const LivretAStartIndex = findStartIndex(MonthlyLivretAReturns, TARGET_START_DATE);
+const LivretAEndIndex = LivretAStartIndex + NUMBER_OF_ENTRIES;
+const LivretASelectedEntries = MonthlyLivretAReturns.slice(LivretAStartIndex, LivretAEndIndex);
+const monthlyLivretARates = LivretASelectedEntries.map(entry => entry[1]);   // Rendements Livret A mensualisés
+
+const ActionsStartIndex = findStartIndex(MonthlyActionsReturns, TARGET_START_DATE);
+const ActionsEndIndex = ActionsStartIndex + NUMBER_OF_ENTRIES;
+const ActionsSelectedEntries = MonthlyActionsReturns.slice(ActionsStartIndex, ActionsEndIndex);
+const monthlyActionsRates = ActionsSelectedEntries.map(entry => entry[1]);   // Rendements S&P 500 mensualisés
 
 // Références aux éléments du DOM
 const currentYearEl = document.getElementById('current-year');
@@ -104,7 +127,7 @@ setInterval(() => {
   actionsProfit = actionsResult.newProfit;
 
   updateUI();
-}, 1000); // Toutes les secondes représentent un mois
+}, 1250); // Interval en ms qui représente un mois
 
 // Fonction pour ouvrir la modale avec l'action spécifiée
 function openLivretAModal(action) {
@@ -232,22 +255,6 @@ withdrawButtonActions.addEventListener('click', () => {
     alert("Pas assez d'argent sur les Actions pour retirer !");
   }
 });
-
-/**
- * Convertit un tableau de rendements annuels en rendements mensuels.
- * @param {number[]} annualReturns - Tableau des rendements annuels (par exemple, [0.17, -0.09]).
- * @returns {number[]} - Tableau des rendements mensuels, avec chaque rendement annuel converti en 12 rendements mensuels équivalents.
- */
-function convertAnnualToMonthly(annualReturns) {
-  const expandedMonthlyRates = [];
-  annualReturns.forEach(annual => {
-    const monthlyRate = Math.pow(1 + annual, 1 / 12) - 1;
-    for (let i = 0; i < 12; i++) {
-      expandedMonthlyRates.push(parseFloat(monthlyRate.toFixed(6)));
-    }
-  });
-  return expandedMonthlyRates;
-}
 
 /**
  * Calcule le rendement mensuel d'un investissement.
