@@ -52,7 +52,20 @@ const totalWealthEl = document.getElementById('total-wealth');
 
 const livretAEl = document.getElementById('livret-a-amount');
 const livretAProfitEl = document.getElementById('livret-a-profit');
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleButton = document.getElementById('toggle-view-livretA');
+  toggleButton.addEventListener('click', () => {
+    const isAmountVisible = livretAEl.classList.contains('active');
 
+    if (isAmountVisible) {
+      livretAEl.classList.remove('active');
+      livretAProfitEl.classList.add('active');
+    } else {
+      livretAProfitEl.classList.remove('active');
+      livretAEl.classList.add('active');
+    }
+  });
+});
 const investButtonLivretA = document.getElementById('invest-button-livretA');
 const withdrawButtonLivretA = document.getElementById('withdraw-button-livretA');
 const livretAModal = document.getElementById('livretA-modal');
@@ -66,6 +79,19 @@ const withdrawButtonObligations = document.getElementById('withdraw-button-oblig
 
 const actionsEl = document.getElementById('actions-amount');
 const actionsProfitEl = document.getElementById('actions-profit');
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleButton = document.getElementById('toggle-view-actions');
+  toggleButton.addEventListener('click', () => {
+    const isAmountVisible = actionsEl.classList.contains('active');
+    if (isAmountVisible) {
+      actionsEl.classList.remove('active');
+      actionsProfitEl.classList.add('active');
+    } else {
+      actionsProfitEl.classList.remove('active');
+      actionsEl.classList.add('active');
+    }
+  });
+});
 const investButtonActions = document.getElementById('invest-button-actions');
 const withdrawButtonActions = document.getElementById('withdraw-button-actions');
 
@@ -108,6 +134,9 @@ function updateUI() {
 setInterval(() => {
   if (currentMonthIndex < (totalYears * 12) - 1) {
     currentMonthIndex++;
+  }else {
+    // Fin de partie (code temporaire)
+    alert("Fin de partie");
   }
   //console.log(`currentMonthIndex: ${currentMonthIndex}`);
   currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 

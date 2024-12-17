@@ -107,6 +107,11 @@
   .module-amount {
     font-size: 1.3em;
     margin: 20px 0;
+    display: none;                /* Affichage avec le toggle */
+  }
+
+  .module-amount.active {
+    display: block;               /* Show active content */
   }
 
 /* Buttons */
@@ -133,6 +138,32 @@
   .action-button:disabled {
     background: #95a5a6;    /* Couleur grise pour le bouton désactivé */
     cursor: not-allowed;
+  }
+
+  .toggle-container {
+    display: flex;
+    justify-content: center;    /* Centers items vertically within the module*/
+    gap: 10px;                  /* Space between toggle button and content */
+    margin-bottom: 20px;        /* Space below the toggle container */
+    width: 100%;                /* Makes the container take full width */
+  }
+  
+  .toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.3s ease;
+  }
+
+  .toggle-button img {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+  }
+
+  .toggle-button:hover img {
+    transform: rotate(180deg) scale(1.05);
   }
 
   .modal-amount {
@@ -188,5 +219,15 @@
 
   .modules-container {
     flex-direction: column;
+  }
+
+  .button-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-button {
+    width: 100%;
+    margin-right: 0;
   }
 }
