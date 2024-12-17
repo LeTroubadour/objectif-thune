@@ -70,6 +70,14 @@
   }
 
   .module {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    /* Centers items vertically within the module*/
+    align-items: center;        /* Centers items horizontally within the module*/
+
+    position: relative;         /* Positioning context for the pseudo-element */
+    border: 2px solid #000;   /* Main border */
+
     background: #ebecee;
     color: #333;
     padding: 20px;
@@ -77,6 +85,19 @@
     border-radius: 5px;           /* Bords arondis */
 
     flex: 1;
+  }
+  
+  /* Pseudo-element to create inner-border*/
+  .module::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    left: 5px;
+    border: 2px solid rgb(2, 2, 2);
+    border-radius: inherit;
+    pointer-events: none;         /* Ensures the pseudo-element doesn't interfere with interactions */
   }
 
   .module h2 {
@@ -89,6 +110,11 @@
   }
 
 /* Buttons */
+
+  .button-group {
+    display: flex;
+    gap: 10px;
+  }
 
   .action-button {
     background: #2ecc71;

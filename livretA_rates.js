@@ -1,5 +1,5 @@
 /*
-// Tableau des rendements mensuels du Livret A de 1980 à 2024
+// Tableau des rendements mensuels du Livret A de 1980 à 2023
 // source: https://selectra.info/finance/guides/livrets-epargne/livret-a/historique
 */
 export const MonthlyLivretAReturns = [
