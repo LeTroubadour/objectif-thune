@@ -21,6 +21,7 @@
 
 /* Dashboard */
 
+
   .dashboard {
     width: 250px;                 /* Largeur fixe */
     background-color: #FFDAB9;  /* Couleur de fond */
@@ -140,6 +141,7 @@
     cursor: not-allowed;
   }
 
+/* Affichage montants investis ou profits avec toggle */
   .toggle-container {
     display: flex;
     justify-content: center;    /* Centers items vertically within the module*/
@@ -166,30 +168,40 @@
     transform: rotate(180deg) scale(1.05);
   }
 
-  .modal-amount {
-    display: none;            /* Cachée par défaut */
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+/* Affichage composant de saisie manuelle de montant à investir ou retirer */
+  .action-form {
+    display: none;                  /* Hidden by default */
+    gap: 10px;                      /* Space between elements */
+    width: 100%;                    /* Full width */
+    max-width: 350px;               /* Optional: Limits the width */
+    margin-top: 20px;               /* Space above the form */
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 2px solid #000;
+    border-radius: 8px;
+    position: relative;             /* For positioning the close icon */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
-  .modal-amount-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    gap: 10px;
-    border: 1px solid #888;
-    width: 350px;
-    border-radius: 8px;
-    position: relative;
-
+  .form-buttons {
     display: flex;
-    align-items: center;
+    gap: 10px;
+  }
+
+  .confirm-button {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    background-color: #2ecc71;     /* Green for confirm */
+    color: #fff;
+    transition: background-color 0.3s ease;
+  }
+
+  .confirm-button:hover {
+    background-color: #02200f;     /* Darker green on hover */
   }
 
   .close-icon {

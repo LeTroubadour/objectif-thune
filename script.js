@@ -52,26 +52,8 @@ const totalWealthEl = document.getElementById('total-wealth');
 
 const livretAEl = document.getElementById('livret-a-amount');
 const livretAProfitEl = document.getElementById('livret-a-profit');
-document.addEventListener('DOMContentLoaded', () => {
-  const toggleButton = document.getElementById('toggle-view-livretA');
-  toggleButton.addEventListener('click', () => {
-    const isAmountVisible = livretAEl.classList.contains('active');
-
-    if (isAmountVisible) {
-      livretAEl.classList.remove('active');
-      livretAProfitEl.classList.add('active');
-    } else {
-      livretAProfitEl.classList.remove('active');
-      livretAEl.classList.add('active');
-    }
-  });
-});
 const investButtonLivretA = document.getElementById('invest-button-livretA');
 const withdrawButtonLivretA = document.getElementById('withdraw-button-livretA');
-const livretAModal = document.getElementById('livretA-modal');
-const livretAClose = document.getElementById('livretA-close');
-const livretAAmountEl = document.getElementById('livretA-amount');
-const livretAModalConfirmAction = document.getElementById('livretA-confirm-action');
 
 const obligationsEl = document.getElementById('obligations-amount');
 const investButtonObligations = document.getElementById('invest-button-obligations');
@@ -158,83 +140,103 @@ setInterval(() => {
   updateUI();
 }, 1250); // Interval en ms qui représente un mois
 
-// Fonction pour ouvrir la modale avec l'action spécifiée
-function openLivretAModal(action) {
-  livretAModal.style.display = 'block';
-  livretAAmountEl.value = '';
+// Gestion des interactions du module du livret A
+document.addEventListener('DOMContentLoaded', () => {
 
-  if (action === 'invest') {
-    livretAModalConfirmAction.textContent = 'Investir';
-    livretAModalConfirmAction.setAttribute('data-action', 'invest');
-  } else if (action === 'withdraw') {
-    livretAModalConfirmAction.textContent = 'Retirer';
-    livretAModalConfirmAction.setAttribute('data-action', 'withdraw');
-  }
-}
-// Gestionnaire d'événements pour ouvrir la modale d'investissement
-investButtonLivretA.addEventListener('click', () => {
-  openLivretAModal('invest');
-});
-// Gestionnaire d'événements pour ouvrir la modale de retrait
-withdrawButtonLivretA.addEventListener('click', () => {
-  openLivretAModal('withdraw');
-});
-// Gestionnaire d'événements pour fermer la modale avec l'icone
-livretAClose.addEventListener('click', () => {
-  livretAModal.style.display = 'none';
-});
-// Gestionnaire d'événements pour fermer la modale en cliquant en dehors
-window.addEventListener('click', (event) => {
-  if (event.target == livretAModal) {
-    livretAModal.style.display = 'none';
-  }
-});
+  // Affichage montant investis / profits
+  const toggleButton = document.getElementById('toggle-view-livretA');
+  toggleButton.addEventListener('click', () => {
+    const isAmountVisible = livretAEl.classList.contains('active');
 
-// Gestionnaire d'événements pour confirmer l'action (invest ou withdraw)
-livretAModalConfirmAction.addEventListener('click', () => {
-  const action = livretAModalConfirmAction.getAttribute('data-action');
-  const amount = parseFloat(livretAAmountEl.value);
-
-  // Vérifier si la saisie est un nombre valide
-  if (isNaN(amount) || amount <= 0) {
-    alert("Veuillez entrer un montant valide à retirer (supérieur à 0).");
-    return;
-  }
-
-  if (action === 'invest') {
-    // Vérifier si le plafond est déjà atteint ou dépassé
-    if (livretA >= MAX_LIVRET_A) {
-      alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
-      return;
-    }
-
-    // Vérifier si l'investissement actuel dépasserait le plafond
-    if (livretA + amount > MAX_LIVRET_A) {
-      const montantPossible = MAX_LIVRET_A - livretA;
-      alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
-      return;
-    }
-
-    // Vérifier si l'utilisateur a suffisamment d'argent disponible
-    if (availableMoney >= amount) {
-      availableMoney -= amount;
-      livretA += amount;
-      updateUI();
-      livretAModal.style.display = 'none';
+    if (isAmountVisible) {
+      livretAEl.classList.remove('active');
+      livretAProfitEl.classList.add('active');
     } else {
-      alert("Pas assez d'argent disponible pour investir !");
+      livretAProfitEl.classList.remove('active');
+      livretAEl.classList.add('active');
     }
-  } else if (action === 'withdraw') {
-    // Vérifier si l'utilisateur a suffisamment d'argent dans le Livret A
-    if (livretA >= amount) {
-      availableMoney += amount;
-      livretA -= amount;
-      updateUI();
-      livretAModal.style.display = 'none';
-    } else {
-      alert("Pas assez d'argent sur le Livret A pour retirer !");
+  });
+
+  // Affichage fenetre pour définir le montant à investir ou retirer
+  const actionForm = document.getElementById('livretA-action-form');
+  const closeForm = document.getElementById('livretA-close-form');
+  const actionAmountInput = document.getElementById('livretA-action-amount');
+  const confirmAction = document.getElementById('livretA-confirm-action');
+
+  let currentAction = null;
+
+  function openActionForm(action) {
+    currentAction = action;
+    actionForm.classList.add('active');
+    document.querySelector('.button-group').style.display = 'none';
+    actionForm.style.display = 'flex';
+    if (action === 'invest') {
+        actionAmountInput.placeholder = "Montant à investir";
+    } else if (action === 'withdraw') {
+        actionAmountInput.placeholder = "Montant à retirer";
     }
   }
+
+  function closeActionForm() {
+    currentAction = null;
+    actionForm.classList.remove('active');
+    actionForm.style.display = 'none';
+    document.querySelector('.button-group').style.display = 'flex';
+    actionAmountInput.value = '';
+  }
+
+  investButtonLivretA.addEventListener('click', () => {
+    openActionForm('invest');
+  });
+
+  withdrawButtonLivretA.addEventListener('click', () => {
+    openActionForm('withdraw');
+  });
+
+  closeForm.addEventListener('click', () => {
+    closeActionForm();
+  });
+
+  confirmAction.addEventListener('click', () => {
+    const amount = parseFloat(actionAmountInput.value);
+    
+    if (isNaN(amount) || amount <= 0) {
+        alert("Veuillez entrer un montant valide (supérieur à 0).");
+        return;
+    }
+
+    if (currentAction === 'invest') {
+
+        if (livretA >= MAX_LIVRET_A) {
+            alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
+            return;
+        }
+
+        if (livretA + amount > MAX_LIVRET_A) {
+            const montantPossible = MAX_LIVRET_A - livretA;
+            alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
+            return;
+        }
+
+        if (availableMoney >= amount) {
+            availableMoney -= amount;
+            livretA += amount;
+            updateUI();
+            closeActionForm();
+        } else {
+            alert("Pas assez d'argent disponible pour investir !");
+        }
+    } else if (currentAction === 'withdraw') {
+        if (livretA >= amount) {
+            livretA -= amount;
+            availableMoney += amount;
+            updateUI();
+            closeActionForm();
+        } else {
+            alert("Pas assez d'argent sur le Livret A pour retirer !");
+        }
+    }
+  });
 });
 
 // Gestionnaire d'événements pour investir dans les Obligations
