@@ -207,6 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
     actionAmountInput.value = maxAmount;
   });
 
+  actionAmountInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      confirmAction.click(); // Simule un clic sur le bouton de confirmation
+    }
+  });
+
   confirmAction.addEventListener('click', () => {
     const amount = parseFloat(actionAmountInput.value);
     
