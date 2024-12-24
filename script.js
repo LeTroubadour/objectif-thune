@@ -167,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openActionForm(action) {
     currentAction = action;
-    actionForm.classList.add('active');
     document.querySelector('.button-group').style.display = 'none';
     actionForm.style.display = 'flex';
     if (action === 'invest') {
@@ -179,7 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeActionForm() {
     currentAction = null;
-    actionForm.classList.remove('active');
     actionForm.style.display = 'none';
     document.querySelector('.button-group').style.display = 'flex';
     actionAmountInput.value = '';
