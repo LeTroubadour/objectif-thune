@@ -172,9 +172,9 @@
     display: none;                  /* Hidden by default */
     gap: 10px;                      /* Space between elements */
     width: 100%;                    /* Full width */
-    max-width: 350px;               /* Optional: Limits the width */
+    max-width: 420px;               /* Optional: Limits the width */
     background-color: #f9f9f9;
-    border: 2px solid #000;*
+    border: 2px solid #000;
     border-radius: 6px;
     position: relative;             /* For positioning the close icon */
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -184,6 +184,21 @@
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+  }
+
+  .max-button {
+    padding: 8px 12px;
+    margin-left: 10px;
+    background-color: #5a5e5b;
+    color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  
+  .max-button:hover {
+    background-color: #e0e0e0;
   }
 
   .confirm-button {

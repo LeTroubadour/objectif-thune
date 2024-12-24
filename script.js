@@ -138,7 +138,7 @@ setInterval(() => {
   actionsProfit = actionsResult.newProfit;
 
   updateUI();
-}, 1250); // Interval en ms qui représente un mois
+}, 5000); // Interval en ms qui représente un mois
 
 // Gestion des interactions du module du livret A
 document.addEventListener('DOMContentLoaded', () => {
@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeForm = document.getElementById('livretA-close-form');
   const actionAmountInput = document.getElementById('livretA-action-amount');
   const confirmAction = document.getElementById('livretA-confirm-action');
+  const maxButton = document.getElementById('livretA-max-button');
 
   let currentAction = null;
 
@@ -193,6 +194,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeForm.addEventListener('click', () => {
     closeActionForm();
+  });
+
+  maxButton.addEventListener('click', () => {
+    let maxAmount = 0;
+    if (currentAction === 'invest') {
+      maxAmount = MAX_LIVRET_A - livretA;
+    } else if (currentAction === 'withdraw') {
+      maxAmount = livretA;
+    }
+  
+    maxAmount = Math.max(maxAmount, 0);
+    
+    actionAmountInput.value = maxAmount;
   });
 
   confirmAction.addEventListener('click', () => {
