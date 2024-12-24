@@ -200,12 +200,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let maxAmount = 0;
     if (currentAction === 'invest') {
       maxAmount = MAX_LIVRET_A - livretA;
+      maxAmount = Math.max(maxAmount, 0);
     } else if (currentAction === 'withdraw') {
       maxAmount = livretA;
     }
-  
-    maxAmount = Math.max(maxAmount, 0);
-    
     actionAmountInput.value = maxAmount;
   });
 
