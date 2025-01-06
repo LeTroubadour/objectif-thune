@@ -11,7 +11,6 @@
   }
 
 /* Container global */
-
   .container {
     height: 100vh;                /* Hauteur totale de la fenêtre */
     overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
@@ -19,9 +18,7 @@
     display: flex;
   }
 
-/* Dashboard */
-
-
+/* Affichage Dashboard */
   .dashboard {
     width: 250px;                 /* Largeur fixe */
     background-color: #FFDAB9;  /* Couleur de fond */
@@ -57,8 +54,7 @@
     display: block;             /* Assure que l'image est traitée comme un bloc */
   }
 
-/* Section contenant les modules d'investissement */
-
+/* Affichage section contenant les modules d'investissement */
   .modules-container {
     background-color: #777574;  /* Couleur de fond */
     padding: 10px;
@@ -87,61 +83,24 @@
 
     flex: 1;
   }
-  
-  /* Pseudo-element to create inner-border*/
-  .module::before {
-    content: "";
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    bottom: 5px;
-    left: 5px;
-    border: 2px solid rgb(2, 2, 2);
-    border-radius: inherit;
-    pointer-events: none;         /* Ensures the pseudo-element doesn't interfere with interactions */
-  }
+    /* Pseudo-element to create inner-border*/
+    .module::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      bottom: 5px;
+      left: 5px;
+      border: 2px solid rgb(2, 2, 2);
+      border-radius: inherit;
+      pointer-events: none;         /* Ensures the pseudo-element doesn't interfere with interactions */
+    }
 
   .module h2 {
     font-size: 1.2em;
   }
 
-  .module-amount {
-    font-size: 1.3em;
-    margin: 20px 0;
-    display: none;                /* Affichage avec le toggle */
-  }
-
-  .module-amount.active {
-    display: block;
-  }
-
-/* Buttons */
-
-  .button-group {
-    display: flex;
-    gap: 10px;
-  }
-
-  .action-button {
-    background: #2ecc71;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;         /* Bords arondis */
-    cursor: pointer;
-    margin-right: 10px;
-  }
-
-  .action-button:hover {
-    background: #105c2f;
-  }
-
-  .action-button:disabled {
-    background: #95a5a6;    /* Couleur grise pour le bouton désactivé */
-    cursor: not-allowed;
-  }
-
-/* Affichage montants investis ou profits avec toggle */
+  /* Affichage montants investis ou profits avec toggle */
   .toggle-container {
     display: flex;
     justify-content: center;    /* Centers items vertically within the module*/
@@ -167,7 +126,46 @@
     transform: rotate(180deg) scale(1.05);
   }
 
-/* Affichage composant de saisie manuelle de montant à investir ou retirer */
+  .module-amount {
+    font-size: 1.3em;
+    margin: 20px 0;
+    display: none;
+  }
+
+  .module-amount.active {
+    display: block;
+  }
+
+/* Affichage des bouttons Investir et Retirer */
+  .button-group {
+    display: flex;
+    gap: 10px;
+  }
+
+  .action-button {
+    background: #2ecc71;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;         /* Bords arondis */
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .action-button:hover {
+    background: #105c2f;
+  }
+
+  .action-button:disabled {
+    background: #95a5a6;    /* Couleur grise pour le bouton désactivé */
+    cursor: not-allowed;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Affichage composant de saisie manuelle de montant à investir ou retirer */
   .action-form {
     display: none;                  /* Hidden by default */
     gap: 10px;                      /* Space between elements */
@@ -180,11 +178,45 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
-  .form-buttons {
+  .action-form.show {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+    opacity: 1;
+    transform: translateY(0);
   }
+
+  .close-icon {
+    color: #420303;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-icon:hover {
+    color: rgb(253, 3, 3);
+    text-decoration: none;
+  }
+
+  .action-amount {
+    border: none;              /* Removes the border */
+    outline: none;             /* Removes the focus outline (use with caution) */
+    text-align: right;         /* Aligns text to the right */
+    background: transparent;   /* Makes the background transparent */
+    
+    /* Remove spinner controls in Firefox */
+    -moz-appearance: textfield;     /* Changes appearance to textfield */
+  }
+    /* Remove spinner controls in WebKit browsers */
+    .action-amount::-webkit-inner-spin-button,
+    .action-amount::-webkit-outer-spin-button {
+      -webkit-appearance: none; /* Removes the default appearance */
+      margin: 0;                /* Removes any default margin */
+    }
+    /* Remove spinner controls in Internet Explorer */
+    .action-amount::-ms-clear,
+    .action-amount::-ms-reveal {
+      display: none; /* Hides the clear and reveal buttons */
+    }
 
   .max-button {
     padding: 8px 12px;
@@ -213,20 +245,6 @@
 
   .confirm-button:hover {
     background-color: #02200f;     /* Darker green on hover */
-  }
-
-  .close-icon {
-    color: #420303;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close-icon:hover,
-  .close-icon:focus {
-    color: black;
-    text-decoration: none;
   }
 
 /* Responsive adjustments */

@@ -140,7 +140,7 @@ setInterval(() => {
   updateUI();
 }, 5000); // Interval en ms qui représente un mois
 
-// Gestion des interactions du module du livret A
+// Gestion des interactions
 document.addEventListener('DOMContentLoaded', () => {
 
   // Affichage montant investis / profits
@@ -157,102 +157,152 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Affichage fenetre pour définir le montant à investir ou retirer
-  const actionForm = document.getElementById('livretA-action-form');
-  const closeForm = document.getElementById('livretA-close-form');
-  const actionAmountInput = document.getElementById('livretA-action-amount');
-  const confirmAction = document.getElementById('livretA-confirm-action');
-  const maxButton = document.getElementById('livretA-max-button');
-
-  let currentAction = null;
-
-  function openActionForm(action) {
-    currentAction = action;
-    document.querySelector('.button-group').style.display = 'none';
-    actionForm.style.display = 'flex';
-    if (action === 'invest') {
-        actionAmountInput.placeholder = "Montant à investir";
-    } else if (action === 'withdraw') {
-        actionAmountInput.placeholder = "Montant à retirer";
-    }
-  }
-
-  function closeActionForm() {
-    currentAction = null;
-    actionForm.style.display = 'none';
-    document.querySelector('.button-group').style.display = 'flex';
-    actionAmountInput.value = '';
-  }
-
-  investButtonLivretA.addEventListener('click', () => {
-    openActionForm('invest');
-  });
-
-  withdrawButtonLivretA.addEventListener('click', () => {
-    openActionForm('withdraw');
-  });
-
-  closeForm.addEventListener('click', () => {
-    closeActionForm();
-  });
-
-  maxButton.addEventListener('click', () => {
-    let maxAmount = 0;
-    if (currentAction === 'invest') {
-      maxAmount = MAX_LIVRET_A - livretA;
-      maxAmount = Math.max(maxAmount, 0);
-    } else if (currentAction === 'withdraw') {
-      maxAmount = livretA;
-    }
-    actionAmountInput.value = maxAmount;
-  });
-
-  actionAmountInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      confirmAction.click(); // Simule un clic sur le bouton de confirmation
-    }
-  });
-
-  confirmAction.addEventListener('click', () => {
-    const amount = parseFloat(actionAmountInput.value);
+  /**
+ * Ouvre le formulaire d'action ppour définir le montant à investir ou retirer
+ * @param {HTMLElement} button - Le bouton cliqué.
+ */
+  function openActionForm(button) {
+    // Trouver le bouton parent
+    const module = button.getAttribute('data-module');
+    const action = button.getAttribute('data-action');
+    // Trouver le module parent
+    const moduleElement = button.closest('.module');
+    // Trouver le formulaire parent
+    const actionForm = moduleElement.querySelector('.action-form');
     
-    if (isNaN(amount) || amount <= 0) {
+    // Masquer les boutons Investir et Retirer
+    const investButton = moduleElement.querySelector(`.action-button[data-action="invest"]`);
+    const withdrawButton = moduleElement.querySelector(`.action-button[data-action="withdraw"]`);
+    investButton.classList.add('hidden');
+    withdrawButton.classList.add('hidden');
+
+    // Trouver les éléments dans le formulaire parent
+    const actionFormClose = actionForm.querySelector('.close-icon');
+    const actionAmountInput = actionForm.querySelector('.action-amount');
+    const actionMaxButton = actionForm.querySelector('.max-button');
+    const actionConfirmButton = actionForm.querySelector('.confirm-button');
+
+    // Afficher et configurer le formulaire
+    actionForm.classList.add('show');
+    actionAmountInput.value = '';
+    actionAmountInput.placeholder = `Montant`;
+    actionAmountInput.focus();
+    
+    // Gestionnaire pour fermer le formulaire via la croix
+    actionFormClose.onclick = () => {
+      closeActionForm(actionForm, investButton, withdrawButton);
+    };
+  
+    // Gestionnaire pour fermer le formulaire en cliquant en dehors
+    document.addEventListener('click', function handleOutsideClick(event) {
+      if (!actionForm.contains(event.target) && !button.contains(event.target)) {
+        closeActionForm(actionForm, investButton, withdrawButton);
+        document.removeEventListener('click', handleOutsideClick);
+      }
+    });
+  
+    // Gestionnaire du bouton MAX
+    actionMaxButton.onclick = () => {
+      let maxAmount = 0;
+      if (action === 'invest') {
+        if (module === 'livretA') {
+          maxAmount = Math.min(availableMoney, MAX_LIVRET_A - livretA);
+        } else if (module === 'actions') {
+          maxAmount = availableMoney;
+        }
+      } else if (action === 'withdraw') {
+        if (module === 'livretA') {
+          maxAmount = livretA;
+        } else if (module === 'actions') {
+          maxAmount = actions;
+        }
+      }
+      maxAmount = Math.max(maxAmount, 0);
+      actionAmountInput.value = maxAmount;
+    };
+  
+    // Gestionnaire pour la confirmation de l'action
+    actionConfirmButton.onclick = () => {
+      const amount = parseFloat(actionAmountInput.value);
+    
+      if (isNaN(amount) || amount <= 0) {
         alert("Veuillez entrer un montant valide (supérieur à 0).");
         return;
-    }
-
-    if (currentAction === 'invest') {
-
-        if (livretA >= MAX_LIVRET_A) {
+      }
+      
+      if (action === 'invest') {
+        if (module === 'livretA') {
+          if (livretA >= MAX_LIVRET_A) {
             alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
             return;
-        }
+          }
 
-        if (livretA + amount > MAX_LIVRET_A) {
+          if (livretA + amount > MAX_LIVRET_A) {
             const montantPossible = MAX_LIVRET_A - livretA;
             alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
             return;
+          }
         }
 
         if (availableMoney >= amount) {
-            availableMoney -= amount;
+          availableMoney -= amount;
+          if (module === 'livretA') {
             livretA += amount;
-            updateUI();
-            closeActionForm();
+          } else if (module === 'actions') {
+            actions += amount;
+          }
+          // Ajoutez des cas pour d'autres modules si nécessaire
+          updateUI();
+          closeActionForm(actionForm, investButton, withdrawButton);
         } else {
-            alert("Pas assez d'argent disponible pour investir !");
+          alert("Pas assez d'argent disponible pour investir !");
         }
-    } else if (currentAction === 'withdraw') {
-        if (livretA >= amount) {
+      } else if (action === 'withdraw') {
+        if (module === 'livretA') {
+          if (livretA >= amount) {
             livretA -= amount;
             availableMoney += amount;
             updateUI();
-            closeActionForm();
-        } else {
+            closeActionForm(actionForm, investButton, withdrawButton);
+          } else {
             alert("Pas assez d'argent sur le Livret A pour retirer !");
+          }
+        } else if (module === 'actions') {
+          if (actions >= amount) {
+            actions -= amount;
+            availableMoney += amount;
+            updateUI();
+            closeActionForm(actionForm, investButton, withdrawButton);
+          } else {
+            alert("Pas assez d'argent sur les Actions pour retirer !");
+          }
         }
+        // Ajoutez des cas similaires pour d'autres modules si nécessaire
+      }
     }
+  };
+
+  /**
+   * Ferme le formulaire d'action et affiche les boutons Investir et Retirer.
+   * @param {HTMLElement} actionForm - Le formulaire d'action à fermer.
+   * @param {HTMLElement} investButton - Le bouton Investir à réafficher.
+   * @param {HTMLElement} withdrawButton - Le bouton Retirer à réafficher.
+   */
+  function closeActionForm(actionForm, investButton, withdrawButton) {
+    actionForm.classList.remove('show');
+    
+    // Réafficher les boutons Investir et Retirer
+    investButton.classList.remove('hidden');
+    withdrawButton.classList.remove('hidden');
+  }
+
+  // Gestion des clics sur les boutons d'action
+  document.querySelectorAll('.action-button').forEach(button => {
+    button.addEventListener('click', () => {
+      openActionForm(button);
+    });
   });
+
 });
 
 // Gestionnaire d'événements pour investir dans les Obligations
@@ -279,30 +329,6 @@ withdrawButtonObligations.addEventListener('click', () => {
   }
 });
 
-// Gestionnaire d'événements pour investir dans les Actions
-investButtonActions.addEventListener('click', () => {
-  const investAmount = 100;
-  if (availableMoney >= investAmount) {
-    availableMoney -= investAmount;
-    actions += investAmount;
-    updateUI();
-  } else {
-    alert("Pas assez d'argent disponible pour investir !");
-  }
-});
-
-// Gestionnaire d'événements pour retirer des Actions
-withdrawButtonActions.addEventListener('click', () => {
-  const withdrawAmount = 100;
-  if (actions >= withdrawAmount) {
-    actions -= withdrawAmount;
-    availableMoney += withdrawAmount;
-    updateUI();
-  } else {
-    alert("Pas assez d'argent sur les Actions pour retirer !");
-  }
-});
-
 /**
  * Calcule le rendement mensuel d'un investissement.
  * @param {number} balance - Le solde actuel de l'investissement.
@@ -315,6 +341,15 @@ function applyMonthlyReturn(balance, rate, profit) {
   const newBalance = balance + interestEarned;
   const newProfit = profit + interestEarned;
   return { newBalance, newProfit };
+}
+
+/**
+ * Capitalise la première lettre d'une chaîne.
+ * @param {string} str - La chaîne à capitaliser.
+ * @returns {string} - La chaîne capitalisée.
+ */
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Mise à jour initiale de l'interface utilisateur

@@ -50,15 +50,13 @@
         </div>
 
         <div class="button-group">
-          <button id="invest-button-livretA" class="action-button">Investir</button>
-          <button id="withdraw-button-livretA" class="action-button">Retirer</button>
-        </div>
-        <div id="livretA-action-form" class="action-form">
-          <span id="livretA-close-form" class="close-icon">&times;</span>
-          <input type="number" id="livretA-action-amount" placeholder="Montant" min="0">
-          <button id="livretA-max-button" class="max-button">MAX</button>
-          <div class="form-buttons">
-            <button id="livretA-confirm-action" class="confirm-button">Confirmer</button>
+          <button id="invest-button-livretA" class="action-button" data-module="livretA" data-action="invest">Investir</button>
+          <button id="withdraw-button-livretA" class="action-button" data-module="livretA" data-action="withdraw">Retirer</button>      
+          <div class="action-form" data-module="livretA">
+            <span class="close-icon">&times;</span>
+            <input type="number" class="action-amount" placeholder="Montant" min="0">
+            <button class="max-button">MAX</button>
+            <button class="confirm-button">Confirmer</button>
           </div>
         </div>
       </div>
@@ -89,8 +87,15 @@
         </div>
 
         <div class="button-group">
-          <button id="invest-button-actions" class="action-button">Investir</button>
-          <button id="withdraw-button-actions" class="action-button">Retirer</button>
+          <button id="invest-button-actions" class="action-button" data-module="actions" data-action="invest">Investir</button>
+          <button id="withdraw-button-actions" class="action-button" data-module="actions" data-action="withdraw">Retirer</button>
+      
+          <div class="action-form" data-module="actions">
+            <span class="close-icon">&times;</span>
+            <input type="number" class="action-amount" placeholder="Montant" min="0">
+            <button class="max-button">MAX</button>
+            <button class="confirm-button">Confirmer</button>
+          </div>
         </div>
       </div>
 
