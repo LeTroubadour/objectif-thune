@@ -72,7 +72,7 @@
       </div>
 
       <!-- Module actions (ETF) -->
-      <div class="module">
+      <div class="module hidden" data-module="actions" id="module-actions" >
         <h2>Actions</h2>
 
         <div class="toggle-container">
@@ -101,6 +101,15 @@
 
     </div>
 
+  </div>
+
+  <!-- Overlay pour les transitions -->
+  <div id="overlay" class="hidden">
+    <div class="overlay-content">
+      <h2>Bienvenue dans la Deuxième Année !</h2>
+      <p>Vous avez maintenant accès aux Actions.</p>
+      <button id="continue-button">Continuer</button>
+    </div>
   </div>
 
   <script type="module" src="script.js"></script>

@@ -26,10 +26,10 @@ const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
 const TARGET_START_DATE = `${randomYear}-${randomMonth}`;
 const NUMBER_OF_ENTRIES = totalYears * 12;
     /**
-    * Finds the index of the target date in a Monthly Returns array.
-    * @param {Array} returns - Array of [date, rate] entries.
-    * @param {string} targetDate - Date string in "YYYY-MM" format.
-    * @returns {number} - Index of the target date or -1 if not found.
+     * Trouve l'index de la date cible dans un tableau de rendements mensuels.
+    * @param {Array} returns - Tableau des rendements mensuels [date, taux].
+    * @param {string} targetDate - Date cible au format "YYYY-MM".
+    * @returns {number} - Index de la date cible ou -1 si non trouvé.
     */
     function findStartIndex(returns, targetDate) {
       return returns.findIndex(entry => entry[0] === targetDate);
@@ -77,6 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
 const investButtonActions = document.getElementById('invest-button-actions');
 const withdrawButtonActions = document.getElementById('withdraw-button-actions');
 
+// Références à l'Overlay et au bouton "Continuer"
+const overlay = document.getElementById('overlay');
+const continueButton = document.getElementById('continue-button');
+
+// Variable pour stocker l'intervalle du jeu
+let gameInterval;
 
 // Mise à jour de l'interface utilisateur avec les nouvelles valeurs
 function updateUI() {
@@ -110,35 +116,6 @@ function updateUI() {
     investButtonLivretA.disabled = false;
   }
 }
-
-
-// Incrément mensuel de l'argent disponible et calcul des intérêts
-setInterval(() => {
-  if (currentMonthIndex < (totalYears * 12) - 1) {
-    currentMonthIndex++;
-  }else {
-    // Fin de partie (code temporaire)
-    alert("Fin de partie");
-  }
-  //console.log(`currentMonthIndex: ${currentMonthIndex}`);
-  currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
-
-  availableMoney += 100; 
-
-  // Appliquer les rendements mensuels pour Livret A
-  const livretAMonthlyRate = monthlyLivretARates[currentMonthIndex];
-  const livretAResult = applyMonthlyReturn(livretA, livretAMonthlyRate, livretAProfit);
-  livretA = livretAResult.newBalance;
-  livretAProfit = livretAResult.newProfit;
-
-  // Appliquer les rendements mensuels pour Actions
-  const actionsMonthlyRate = monthlyActionsRates[currentMonthIndex];
-  const actionsResult = applyMonthlyReturn(actions, actionsMonthlyRate, actionsProfit);
-  actions = actionsResult.newBalance;
-  actionsProfit = actionsResult.newProfit;
-
-  updateUI();
-}, 5000); // Interval en ms qui représente un mois
 
 // Gestion des interactions
 document.addEventListener('DOMContentLoaded', () => {
@@ -352,5 +329,83 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Démarre le jeu en initialisant l'intervalle.
+ */
+function startGame() {
+  gameInterval = setInterval(() => {
+    if (currentMonthIndex < (totalYears * 12) - 1) {
+      currentMonthIndex++;
+    } else {
+      // Fin de partie (code temporaire)
+      alert("Fin de partie");
+      clearInterval(gameInterval);
+      return;
+    }
+
+    currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
+
+    availableMoney += 100; 
+
+    // Appliquer les rendements mensuels pour Livret A
+    const livretAMonthlyRate = monthlyLivretARates[currentMonthIndex];
+    const livretAResult = applyMonthlyReturn(livretA, livretAMonthlyRate, livretAProfit);
+    livretA = livretAResult.newBalance;
+    livretAProfit = livretAResult.newProfit;
+
+    // Appliquer les rendements mensuels pour Actions
+    const actionsMonthlyRate = monthlyActionsRates[currentMonthIndex];
+    const actionsResult = applyMonthlyReturn(actions, actionsMonthlyRate, actionsProfit);
+    actions = actionsResult.newBalance;
+    actionsProfit = actionsResult.newProfit;
+
+    updateUI();
+
+    // **Détecter le début de la deuxième année pour afficher l'overlay**
+    if (currentYearIndex === 2 && currentMonthIndex % 12 === 0) {
+      pauseGame();
+      showOverlay();
+    }
+  }, 5000); // Interval en ms qui représente un mois
+}
+
+/* Met en pause le jeu en arrêtant l'intervalle. */
+function pauseGame() {
+  clearInterval(gameInterval);
+}
+
+/* Reprend le jeu en redémarrant l'intervalle. */
+function resumeGame() {
+  startGame();
+}
+
+/* Affiche l'overlay et bloque le jeu. */
+function showOverlay() {
+  overlay.classList.remove('hidden');
+}
+
+/* Cache l'overlay et reprend le jeu, en affichant le module "Actions". */
+function hideOverlay() {
+  overlay.classList.add('hidden');
+  
+  // Afficher le module "Actions"
+  const actionsModule = document.getElementById('module-actions');
+  actionsModule.classList.remove('hidden');
+
+  // Mettre à jour l'UI pour afficher les nouvelles données
+  updateUI();
+
+  // Reprendre le jeu
+  resumeGame();
+}
+
+// Ajouter un gestionnaire d'événement pour le bouton "Continuer" de l'overlay
+continueButton.addEventListener('click', () => {
+  hideOverlay();
+});
+
 // Mise à jour initiale de l'interface utilisateur
 updateUI();
+
+// Démarrer le jeu au chargement de la page
+startGame();
