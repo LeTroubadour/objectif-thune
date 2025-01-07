@@ -66,8 +66,8 @@
         <h2>Obligations</h2>
         <div id="obligations-amount" class="module-amount active">0 € investis</div>
         <div class="button-group">
-          <button id="invest-button-obligations" class="action-button">Investir</button>
-          <button id="withdraw-button-obligations" class="action-button">Retirer</button>
+          <button id="invest-button-obligations" class="action-button" data-module="obligations" data-action="invest">Investir</button>
+          <button id="withdraw-button-obligations" class="action-button" data-module="obligations" data-action="withdraw">Retirer</button>
         </div>
       </div>
 
@@ -95,6 +95,42 @@
             <input type="number" class="action-amount" placeholder="Montant" min="0">
             <button class="max-button">MAX</button>
             <button class="confirm-button">Confirmer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module résidence principale -->
+      <div class="module" data-module="residencePrincipale" id="module-residencePrincipale">
+        <h2>Résidence Principale</h2>
+
+        <!-- État 1: Non investi -->
+        <div class="residence-state state-1">
+          <div class="info">
+            <p><strong>Surface cible :</strong> <span id="residence-surface">50</span> m²</p>
+            <p><strong>Argent nécessaire :</strong> <span id="residence-argentNecessaire">10 000 €</span></p>
+          </div>
+          <div class="button-group">
+            <button id="invest-button-residence" class="action-button" data-module="residencePrincipale" data-action="invest">Investir</button>
+          </div>
+        </div>
+
+        <!-- État 2: Investi -->
+        <div class="residence-state state-2 hidden">
+          <div class="info">
+            <p><strong>Âge :</strong> <span id="residence-age">22</span> ans</p>
+            <p><strong>Taille :</strong> <span id="residence-taille">50</span> m²</p>
+          </div>
+          <div class="toggle-container">
+            <button id="toggle-view-residence" class="toggle-button active">
+              <img src="pictures/down-arrow.png" alt="Toggle View">
+            </button>
+            <div class="toggle-content">
+              <div id="residence-investedAmount" class="module-amount active">10 000 € investis</div>
+              <div id="residence-profit" class="module-amount">0 € de profit</div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button id="sell-button-residence" class="action-button" data-module="residencePrincipale" data-action="sell">Vendre</button>
           </div>
         </div>
       </div>

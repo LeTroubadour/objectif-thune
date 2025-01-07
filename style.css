@@ -15,7 +15,7 @@
   display: none !important;
 }
 
-/* Container global */
+/* Container dashboard et modules */
   .container {
     height: 100vh;                /* Hauteur totale de la fenêtre */
     overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
@@ -141,9 +141,15 @@
     display: block;
   }
 
+  /* Affichages spécifiques du module residence principale */
+  #module-residencePrincipale .info p {
+    margin: 5px 0;
+  }
+
 /* Affichage des bouttons Investir et Retirer */
   .button-group {
     display: flex;
+    justify-content: center;
     gap: 10px;
   }
 
