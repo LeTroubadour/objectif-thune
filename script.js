@@ -8,7 +8,7 @@ const totalYears = 20;      // Durée de la simulation en années
 let currentYearIndex = 1;   // 1 = première année
 let currentMonthIndex = 0;  // 0 = premier mois
 let gameInterval;           // Variable pour stocker l'intervalle du jeu
-let availableMoney = 10000; // Argent disponible initial
+let availableMoney = 100000; // Argent disponible initial
 
 // Initialisation des variables pour le module livret A
 let livretA = 0;
@@ -29,6 +29,12 @@ let residenceInvestedAmount = 0;
 let residenceProfit = 0;
 const residenceSurfaceCible = 50;         // Montant en m2 par défaut avant création table
 const residenceArgentNecessaire = 10000;  // Montant en € par défaut avant création table
+
+// Initialisation des variables pour le module actifs alternatifs
+let actifsAlternatifsInvestments = [];    // Tableau pour stocker les investissements
+let actifsAlternatifsTotalProfit = 0;
+const MAX_ACTIFS_INVESTMENTS = 3;
+const ACTIVITE_ALTERNATIF_MIN_INVEST = 10000;
 
 // Construction des tables de rendements mensualisés
 // Dates de début comprises entre 1980-01 et 2004-01 pour une partie de 20 ans et des données allant de 1980-01 à 2023-12
@@ -78,6 +84,10 @@ const NUMBER_OF_ENTRIES = totalYears * 12;
   const residenceEL= document.getElementById('residence-investedAmount');
   const residenceProfitEL= document.getElementById('residence-profit');
 
+  const investButtonActifs = document.getElementById('invest-button-actifs');
+  const actifsInvestedAmountsEl = document.getElementById('actifs-investedAmounts');
+  const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
+
   const overlay = document.getElementById('overlay');
   const continueButton = document.getElementById('continue-button');
 
@@ -121,9 +131,12 @@ function updateUI() {
     document.getElementById('residence-profit').textContent = `${residenceProfit.toLocaleString('fr-FR')} € de profit`;
   }
 
+  // MAJ module actifs alternatifs
+  if (availableMoney < ACTIVITE_ALTERNATIF_MIN_INVEST) {investButtonActifs.disabled = true;} else {investButtonActifs.disabled = false;}
+
 }
 
-// Gestion des interactions
+// Gestion des interactions des modules livret A et actions
 document.addEventListener('DOMContentLoaded', () => {
 
   // Affichage montant investis / profits livret A
@@ -152,23 +165,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Affichage montant investis / profits residence principale
-  const toggleButtonResidence = document.getElementById('toggle-view-residence');
-  toggleButtonResidence.addEventListener('click', () => {
-    const isAmountVisible = residenceEL.classList.contains('active');
-    if (isAmountVisible) {
-      residenceEL.classList.remove('active');
-      residenceProfitEL.classList.add('active');
-    } else {
-      residenceProfitEL.classList.remove('active');
-      residenceEL.classList.add('active');
-    }
+  // Gestion des clics sur les boutons "Investir" et "Retirer" du module du livret A et du module Actions
+  document.querySelectorAll('.action-button[data-module="livretA"][data-action="invest"], .action-button[data-module="livretA"][data-action="withdraw"], .action-button[data-module="actions"][data-action="invest"], .action-button[data-module="actions"][data-action="withdraw"]').forEach(button => {
+    button.addEventListener('click', () => {
+      openActionForm(button);
+    });
   });
 
   /**
- * Ouvre le formulaire d'action ppour définir le montant à investir ou retirer des modules livret A et Actions
- * @param {HTMLElement} button - Le bouton cliqué.
- */
+  * Ouvre le formulaire d'action pour définir le montant à investir ou retirer des modules livret A et Actions
+  * @param {HTMLElement} button - Le bouton cliqué.
+  */
   function openActionForm(button) {
     // Trouver le bouton parent
     const module = button.getAttribute('data-module');
@@ -299,13 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
     withdrawButton.classList.remove('hidden');
   }
 
-  // Gestion des clics sur les boutons d'action du module du livret A et du module Actions
-  document.querySelectorAll('.action-button[data-module="livretA"][data-action="invest"], .action-button[data-module="livretA"][data-action="withdraw"], .action-button[data-module="actions"][data-action="invest"], .action-button[data-module="actions"][data-action="withdraw"]').forEach(button => {
-    button.addEventListener('click', () => {
-      openActionForm(button);
-    });
-  });
-
 });
 
 // Gestion d'événements sur le module obligations
@@ -332,38 +332,232 @@ withdrawButtonObligations.addEventListener('click', () => {
 });
 
 // Gestion d'événements sur le module résidence principale.
-document.getElementById('invest-button-residence').addEventListener('click', () => {
-  investResidence();
-});
 
-document.getElementById('sell-button-residence').addEventListener('click', () => {
-  sellResidence();
-});
+  // Affichage montant investis / profits residence principale
+  const toggleButtonResidence = document.getElementById('toggle-view-residence');
+  toggleButtonResidence.addEventListener('click', () => {
+    const isAmountVisible = residenceEL.classList.contains('active');
+    if (isAmountVisible) {
+      residenceEL.classList.remove('active');
+      residenceProfitEL.classList.add('active');
+    } else {
+      residenceProfitEL.classList.remove('active');
+      residenceEL.classList.add('active');
+    }
+  });
+  
+  document.getElementById('invest-button-residence').addEventListener('click', () => {
+    investResidence();
+  });
 
-function investResidence() {
-  if (availableMoney >= residenceArgentNecessaire) {
-    availableMoney -= residenceArgentNecessaire;
-    residenceInvested = true;
-    residenceInvestedAmount = residenceArgentNecessaire;
-    residenceProfit = 0;
-    document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.add('hidden');
-    document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.remove('hidden');
-    updateUI();
-  } else {
-    alert("Pas assez d'argent disponible pour investir dans la résidence principale !");
+  document.getElementById('sell-button-residence').addEventListener('click', () => {
+    sellResidence();
+  });
+
+  function investResidence() {
+    if (availableMoney >= residenceArgentNecessaire) {
+      availableMoney -= residenceArgentNecessaire;
+      residenceInvested = true;
+      residenceInvestedAmount = residenceArgentNecessaire;
+      residenceProfit = 0;
+      document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.add('hidden');
+      document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.remove('hidden');
+      updateUI();
+    } else {
+      alert("Pas assez d'argent disponible pour investir dans la résidence principale !");
+    }
   }
-}
 
-function sellResidence() {
-  const totalRecovered = residenceInvestedAmount + residenceProfit;
-  availableMoney += totalRecovered;
-  residenceInvested = false;
-  residenceInvestedAmount = 0;
-  residenceProfit = 0;
-  document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.remove('hidden');
-  document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.add('hidden');
-  updateUI();
-}
+  function sellResidence() {
+    const totalRecovered = residenceInvestedAmount + residenceProfit;
+    availableMoney += totalRecovered;
+    residenceInvested = false;
+    residenceInvestedAmount = 0;
+    residenceProfit = 0;
+    document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.remove('hidden');
+    document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.add('hidden');
+    updateUI();
+  }
+
+// Gestion d'événements sur le module actifs alternatifs.
+
+  // Gestion des clics sur le bouton "Investir" du module Actifs Alternatifs
+  investButtonActifs.addEventListener('click', () => {
+    openActifsActionForm();
+  });
+
+  // Ouvre le formulaire d'action pour investir dans Actifs Alternatifs.
+  function openActifsActionForm() {
+    if (actifsAlternatifsInvestments.length >= MAX_ACTIFS_INVESTMENTS) {
+      alert("Vous avez atteint le nombre maximum d'investissements dans les Actifs Alternatifs.");
+      return;
+    }
+
+    // Masquer l'état 1 et afficher l'état 2 du module Actifs Alternatifs
+    const moduleElement = document.getElementById('module-actifsAlternatifs');
+    moduleElement.querySelector('.actifs-state.state-1').classList.add('hidden');
+    const state2 = moduleElement.querySelector('.actifs-state.state-2');
+    state2.classList.remove('hidden');
+    
+    // Initialiser la durée du placement par défaut à 3 ans
+    const durationButton3 = state2.querySelector('.duration-button[data-duration="3"]');
+    if (durationButton3) {
+      durationButton3.click();
+    }
+
+    // Initialiser le formulaire pour remplir le montant à investir
+    const actionForm = state2.querySelector('.action-form');
+    actionForm.classList.add('show');
+    const actionAmountInput = actionForm.querySelector('.action-amount');
+    actionAmountInput.value = '10000';
+
+    // Gestion du bouton "MAX"
+    const actionMaxButton = actionForm.querySelector('.max-button');
+    actionMaxButton.onclick = () => {
+        const maxAmount = availableMoney >= ACTIVITE_ALTERNATIF_MIN_INVEST ? availableMoney : 0;
+        actionAmountInput.value = maxAmount.toFixed(2);
+    };
+    
+    // Options de fermeture du formulaire via la croix
+    const closeIcon = actionForm.querySelector('.close-icon');
+    closeIcon.onclick = () => {
+      closeActifsActionForm();
+    };
+
+  }
+
+  // Ferme le formulaire d'action pour investir dans Actifs Alternatifs.
+  function closeActifsActionForm() {
+    const moduleElement = document.getElementById('module-actifsAlternatifs');
+    const state2 = moduleElement.querySelector('.actifs-state.state-2');
+    const actionForm = state2.querySelector('.action-form');
+    
+    // Masquer le formulaire d'action
+    actionForm.classList.remove('show');
+    
+    // Réafficher l'état 1 et masquer l'état 2
+    moduleElement.querySelector('.actifs-state.state-1').classList.remove('hidden');
+    state2.classList.add('hidden');
+  }
+
+  /**
+ * Gestion des clics sur les boutons de durée du module Actifs Alternatifs
+ */
+  const durationButtons = document.querySelectorAll('#module-actifsAlternatifs .duration-button');
+  durationButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const duration = parseInt(button.getAttribute('data-duration'));
+      
+      const activeButton = document.querySelector('#module-actifsAlternatifs .duration-button.active');
+      if (activeButton && activeButton !== button) {
+        activeButton.classList.remove('active');
+      }
+      button.classList.add('active');
+      
+      handleDurationChoice(duration); // Logique très moche mais qui marche
+    });
+  });
+
+  /**
+ * Fonction intermédiaire et pas très élégante
+ */
+  function handleDurationChoice(duration) {
+    const moduleElement = document.getElementById('module-actifsAlternatifs');
+    const state2 = moduleElement.querySelector('.actifs-state.state-2');
+    const actionForm = state2.querySelector('.action-form');
+    const actionAmountInput = actionForm.querySelector('.action-amount');
+    const actionConfirmButton = actionForm.querySelector('.confirm-button');
+
+    // Gestion du bouton "Confirmer"
+    actionConfirmButton.onclick = () => {
+      const amount = parseFloat(actionAmountInput.value);
+      confirmActifsInvestment(amount, duration);
+    };
+    
+  }
+    
+  /**
+ * Gère la confirmation de l'investissement dans Actifs Alternatifs.
+ * @param {number} amount - Montant investi
+ * @param {number} duration - Durée de l'investissement en années (3 ou 7)
+ */
+  function confirmActifsInvestment(amount, duration) {
+
+    if (isNaN(amount) || amount < ACTIVITE_ALTERNATIF_MIN_INVEST) {
+      alert(`Veuillez entrer un montant valide (minimum ${ACTIVITE_ALTERNATIF_MIN_INVEST.toLocaleString('fr-FR')} €).`);
+      return;
+    }
+    
+    if (availableMoney < amount) {
+      alert("Pas assez d'argent disponible pour investir !");
+      return;
+    }
+
+    const investment = {
+      amount: amount,
+      duration: duration,
+      startMonth: currentMonthIndex,
+      profit: 0,
+      id: Date.now() // Identifiant unique
+    };
+
+    actifsAlternatifsInvestments.push(investment);
+    availableMoney -= amount;
+
+    addActifsInvestmentToUI(investment);
+    closeActifsActionForm();
+    updateUI();
+  }
+
+  /**
+  * Ajoute une ligne d'investissement dans l'interface utilisateur.
+  * @param {Object} investment - Objet d'investissement
+  */
+  function addActifsInvestmentToUI(investment) {
+    const li = document.createElement('li');
+    li.id = `actifs-investment-${investment.id}`;
+    li.innerHTML = `
+      <span>Investissement de ${investment.amount.toLocaleString('fr-FR')} € pour ${investment.duration} ans</span>
+      <span>Profit : ${investment.profit.toLocaleString('fr-FR')} €</span>
+    `;
+    actifsInvestedAmountsEl.appendChild(li);
+  }
+
+  /**
+ * Met à jour les profits cumulés pour Actifs Alternatifs.
+ */
+  function updateActifsProfits() {
+    actifsAlternatifsInvestments.forEach(investment => {
+      // Calculer le nombre de mois écoulés
+      const monthsElapsed = currentMonthIndex - investment.startMonth;
+      
+      // Vérifier si la durée est atteinte
+      if (monthsElapsed >= investment.duration * 12) {
+        // Ajouter le profit et retirer l'investissement
+        availableMoney += investment.amount + investment.profit;
+        // Supprimer l'investissement du tableau
+        actifsAlternatifsInvestments = actifsAlternatifsInvestments.filter(inv => inv.id !== investment.id);
+        // Supprimer la ligne de l'UI
+        const li = document.getElementById(`actifs-investment-${investment.id}`);
+        if (li) li.remove();
+      } else {
+        // Appliquer un rendement mensuel (exemple: 0.5%)
+        const monthlyRate = 0.005;
+        const interestEarned = investment.amount * monthlyRate;
+        investment.profit += interestEarned;
+        actifsAlternatifsTotalProfit += interestEarned;
+        
+        // Mettre à jour l'UI pour cette ligne
+        const li = document.getElementById(`actifs-investment-${investment.id}`);
+        if (li) {
+          li.querySelector('span:nth-child(2)').textContent = `Profit : ${investment.profit.toLocaleString('fr-FR')} €`;
+        }
+      }
+    });
+    
+    // Mettre à jour le total des profits
+    actifsTotalProfitEl.textContent = `${actifsAlternatifsTotalProfit.toLocaleString('fr-FR')} €`;
+  }
 
 /**
  * Calcule le rendement mensuel d'un investissement.
@@ -416,6 +610,11 @@ function startGame() {
       const residenceResult = applyMonthlyReturn(residenceInvestedAmount, residenceMonthlyRate, residenceProfit);
       residenceInvestedAmount = residenceResult.newBalance;
       residenceProfit = residenceResult.newProfit;
+    }
+
+    // Appliquer les rendements mensuels pour Actifs Alternatifs
+    if (actifsAlternatifsInvestments.length > 0) {
+      updateActifsProfits();
     }
 
     updateUI();

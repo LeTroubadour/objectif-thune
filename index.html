@@ -62,7 +62,7 @@
       </div>
 
       <!-- Module obligations -->
-      <div class="module">
+      <div class="module ">
         <h2>Obligations</h2>
         <div id="obligations-amount" class="module-amount active">0 € investis</div>
         <div class="button-group">
@@ -100,7 +100,7 @@
       </div>
 
       <!-- Module résidence principale -->
-      <div class="module" data-module="residencePrincipale" id="module-residencePrincipale">
+      <div class="module " data-module="residencePrincipale" id="module-residencePrincipale">
         <h2>Résidence Principale</h2>
 
         <!-- État 1: Non investi -->
@@ -135,6 +135,38 @@
         </div>
       </div>
 
+      <!-- Module Actifs alternatifs -->
+      <div class="module" data-module="actifsAlternatifs" id="module-actifsAlternatifs">
+        <h2>Actifs Alternatifs</h2>
+
+        <!-- État 1: Par défaut -->
+        <div class="actifs-state state-1 ">
+          <div class="info">
+            <ul id="actifs-investedAmounts">
+              <!-- Les investissements sont ajoutés ici dynamiquement -->
+            </ul>
+            <p><strong>Profits Cumulés :</strong> <span id="actifs-totalProfit">0 €</span></p>
+          </div>
+          <div class="button-group">
+            <button id="invest-button-actifs" class="action-button" data-module="actifsAlternatifs" data-action="invest">Investir</button>
+          </div>
+        </div>
+
+        <!-- État 2: Choix de la durée -->
+        <div class="actifs-state state-2 hidden">
+          <div class="button-group duration-buttons">
+            <button class="duration-button" data-duration="3">3 ans</button>
+            <button class="duration-button" data-duration="7">7 ans</button>
+          </div>
+          <div class="action-form" data-module="actifsAlternatifs">
+            <span class="close-icon">&times;</span>
+            <input type="number" class="action-amount" placeholder="Montant" min="10000">
+            <button class="max-button">MAX</button>
+            <button class="confirm-button">Confirmer</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -144,7 +176,7 @@
     <div class="overlay-content">
       <h2>Bienvenue dans la Deuxième Année !</h2>
       <p>Vous avez maintenant accès aux Actions.</p>
-      <button id="continue-button">Continuer</button>
+      <button id="continue-button" class="overlay-continue-button">Continuer</button>
     </div>
   </div>
 
