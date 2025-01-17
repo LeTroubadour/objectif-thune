@@ -1,338 +1,379 @@
+/* Variables pour une gestion centralisée des couleurs */
+:root {
+  --background-color: #f0f0f0;
+  --text-color: #333;
+
+  --dashboard-bg-color: #FFDAB9;
+  --dashboard-amount:#000;
+
+  --modules-container-bg-color: #777574;
+  --module-bg-color: #eeebed;
+  --module-border-color: #000;
+  --module-inner-border-color: rgb(2, 2, 2);
+
+  --button-bg-color: #2ecc71;
+  --button-hover-bg-color: #105c2f;
+  --button-text-color: #fff;
+
+  --action-form-bg-color:#f9f9f9;
+  --action-button-bg-color: #2ecc71;
+  --action-button-hover-bg-color: #105c2f;
+  --action-button-disabled-bg-color:#95a5a6;
+
+  --active-button-bg-color: rgb(36, 35, 35);
+  --inactive-button-bg-color: rgb(87, 85, 85);
+  --highlight-color: #FFC107;
+
+  --close-icon: #420303;
+  --close-icon-hover: rgb(253, 3, 3);
+
+  --max-button-bg-color:#5a5e5b;
+  --max-button-hover-bg-color:##e0e0e0;
+  --max-button-border-color: #ccc;
+  --max-button-text-color: #fff;
+  --max-button-hover-text-color: #000;
+
+  --overlay-bg-color: rgba(0, 0, 0, 0.7);
+  --overlay-content-bg: #fff;
+
+  --hidden-display: none;
+}
+
 /* Paramètres de défaut */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  body {
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: var(--background-color);
+}
 
-/* Classe pour masquer les éléments */
-  .hidden {
-    display: none !important;
-  }
+.hidden {
+  display: var(--hidden-display) !important;
+}
 
 /* Container dashboard et modules */
-  .container {
-    height: 100vh;                /* Hauteur totale de la fenêtre */
-    overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
+.container {
+  height: 100vh;                /* Hauteur totale de la fenêtre */
+  overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
+  display: flex;
+}
 
-    display: flex;
+/* Dashboard */
+.dashboard {
+  width: 250px;
+  background-color: var(--dashboard-bg-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.dashboard-section {
+  margin-bottom: 30px;
+}
+
+.dashboard-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 1px;
+}
+
+.dashboard-amount {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: var(--dashboard-amount);
+}
+
+.dashboard-image {
+  width: 100%;
+  height: auto;               /* Maintient les proportions de l'image */
+  max-width: 200px;           /* Limite la largeur maximale de l'image */
+  margin: 0 auto;             /* Centre l'image horizontalement */
+  display: block;             /* Assure que l'image est traitée comme un bloc */
+}
+
+/* Section contenant les modules d'investissement */
+.modules-container {
+  background: var(--modules-container-bg-color);
+  padding: 10px;
+  gap: 10px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.module {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;    /* Centers items vertically within the module*/
+  align-items: center;        /* Centers items horizontally within the module*/
+  position: relative;         /* Positioning context for the pseudo-element */
+  border: 2px solid var(--module-border-color);   /* Main border */
+  background: var(--module-bg-color);
+  color: var(--text-color);
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  border-radius: 5px;           /* Bords arrondis */
+  flex: 1;
+}
+
+  /* Pseudo-element to create inner-border */
+  .module::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    bottom: 5px;
+    left: 5px;
+    border: 2px solid var(--module-inner-border-color);
+    border-radius: inherit;
+    pointer-events: none;         /* Ensures the pseudo-element doesn't interfere with interactions */
   }
 
-/* Affichage Dashboard */
-  .dashboard {
-    width: 250px;                 /* Largeur fixe */
-    background-color: #FFDAB9;  /* Couleur de fond */
-    padding: 20px;
+.module h2 {
+  font-size: 1.2em;
+}
 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;  /* Aligne les éléments en haut */
-  }
+/* Affichage montants investis ou profits avec toggle */
+.toggle-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
 
-  .dashboard-section {
-    margin-bottom: 30px;
-  }
+.toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.3s ease;
+}
 
-  .dashboard-title {
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 1px;
-  }
+.toggle-button img {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
 
-  .dashboard-amount {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #000;
-  }
+.toggle-button:hover img {
+  transform: rotate(180deg) scale(1.05);
+}
 
-  .dashboard-image {
-    width: 100%;                /* Adapte la largeur de l'image à celle du conteneur */
-    height: auto;               /* Maintient les proportions de l'image */
-    max-width: 200px;           /* Limite la largeur maximale de l'image */
-    margin: 0 auto;             /* Centre l'image horizontalement */
-    display: block;             /* Assure que l'image est traitée comme un bloc */
-  }
+.module-amount {
+  font-size: 1.3em;
+  margin: 20px 0;
+  display: none;
+}
 
-/* Affichage section contenant les modules d'investissement */
-  .modules-container {
-    background-color: #777574;  /* Couleur de fond */
-    padding: 10px;
-    gap: 10px;
+.module-amount.active {
+  display: block;
+}
 
-    display: flex;
-    flex: 1;                      /* Prend tout l'espace restant */
-    flex-direction: column;
-    justify-content: flex-start;  /* Aligne les éléments en haut */
-  }
+/* Affichages spécifiques du module residence principale */
+#module-residencePrincipale .info p {
+  margin: 5px 0;
+}
 
-  .module {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;    /* Centers items vertically within the module*/
-    align-items: center;        /* Centers items horizontally within the module*/
+/* Affichages spécifiques du module actifs alternatifs */
+#module-actifsAlternatifs .info {
+  margin-bottom: 10px;
+}
 
-    position: relative;         /* Positioning context for the pseudo-element */
-    border: 2px solid #000;   /* Main border */
+#module-actifsAlternatifs .info p {
+  margin: 5px 0;
+}
 
-    background: #ebecee;
-    color: #333;
-    padding: 20px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    border-radius: 5px;           /* Bords arondis */
+#module-actifsAlternatifs .info ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 5px 0;
+}
 
-    flex: 1;
-  }
-    /* Pseudo-element to create inner-border*/
-    .module::before {
-      content: "";
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      bottom: 5px;
-      left: 5px;
-      border: 2px solid rgb(2, 2, 2);
-      border-radius: inherit;
-      pointer-events: none;         /* Ensures the pseudo-element doesn't interfere with interactions */
-    }
-
-  .module h2 {
-    font-size: 1.2em;
-  }
-
-  /* Affichage montants investis ou profits avec toggle */
-  .toggle-container {
-    display: flex;
-    justify-content: center;    /* Centers items vertically within the module*/
-    gap: 10px;                  /* Space between toggle button and content */
-    width: 100%;                /* Makes the container take full width */
-  }
-  
-  .toggle-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    transition: transform 0.3s ease;
-  }
-
-  .toggle-button img {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-  }
-
-  .toggle-button:hover img {
-    transform: rotate(180deg) scale(1.05);
-  }
-
-  .module-amount {
-    font-size: 1.3em;
-    margin: 20px 0;
-    display: none;
-  }
-
-  .module-amount.active {
-    display: block;
-  }
-
-  /* Affichages spécifiques du module residence principale */
-  #module-residencePrincipale .info p {
-    margin: 5px 0;
-  }
-
-   /* Affichages spécifiques du module residence principale */
-   #module-actifsAlternatifs .info {
-    margin-bottom: 10px;
-  }
-  
-  #module-actifsAlternatifs .info p {
-    margin: 5px 0;
-  }
-
-  #module-actifsAlternatifs .info ul {
-    list-style-type: disc;
-    padding-left: 20px;
-    margin: 5px 0;
-  }
-
-  #module-actifsAlternatifs .duration-buttons {
+  /* Boutons de durée pour Actifs Alternatifs */
+  .duration-buttons {
     display: flex;
     justify-content: center;
     gap: 20px;
     margin-bottom: 10px;
   }
-  
-  #module-actifsAlternatifs .duration-button {
+
+  .duration-button {
     padding: 20px 15px;
     margin-top: 10px;
     margin-bottom: 10px;
     font-size: 0.9em;
     border: none;
     border-radius: 50%;
-    background-color: rgb(87, 85, 85);
-    color: #fff;
+    background-color: var(--inactive-button-bg-color);
+    color: var(--button-text-color);
     cursor: pointer;
-  }
-
-  #module-actifsAlternatifs .duration-button:hover {
-    background-color: rgb(36, 35, 35);
-  }
-
-  #module-actifsAlternatifs .duration-button.active {
-    background-color: rgb(36, 35, 35);
-  }
-
-  /* Affichage des bouttons Investir et Retirer */
-  .button-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .action-button {
-    background: #2ecc71;
-    color: #fff;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;         /* Bords arondis */
-    cursor: pointer;
-    margin-right: 10px;
-  }
-
-  .action-button:hover {
-    background: #105c2f;
-  }
-
-  .action-button:disabled {
-    background: #95a5a6;    /* Couleur grise pour le bouton désactivé */
-    cursor: not-allowed;
-  }
-
-  /* Affichage composant de saisie manuelle de montant à investir ou retirer */
-  .action-form {
-    display: none;                  /* Hidden by default */
-    gap: 10px;                      /* Space between elements */
-    width: 100%;                    /* Full width */
-    max-width: 420px;               /* Optional: Limits the width */
-    background-color: #f9f9f9;
-    border: 2px solid #000;
-    border-radius: 6px;
-    position: relative;             /* For positioning the close icon */
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-
-  .action-form.show {
-    display: flex;
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .close-icon {
-    color: #420303;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close-icon:hover {
-    color: rgb(253, 3, 3);
-    text-decoration: none;
-  }
-
-  .action-amount {
-    border: none;              /* Removes the border */
-    outline: none;             /* Removes the focus outline (use with caution) */
-    text-align: right;         /* Aligns text to the right */
-    background: transparent;   /* Makes the background transparent */
-    
-    /* Remove spinner controls in Firefox
-    -moz-appearance: textfield;      Changes appearance to textfield */
-  }
-    /* Remove spinner controls in WebKit browsers */
-    .action-amount::-webkit-inner-spin-button,
-    .action-amount::-webkit-outer-spin-button {
-      -webkit-appearance: none; /* Removes the default appearance */
-      margin: 0;                /* Removes any default margin */
-    }
-    /* Remove spinner controls in Internet Explorer */
-    .action-amount::-ms-clear,
-    .action-amount::-ms-reveal {
-      display: none; /* Hides the clear and reveal buttons */
-    }
-
-  .max-button {
-    padding: 8px 12px;
-    margin-left: 10px;
-    background-color: #5a5e5b;
-    color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-  }
-  
-  .max-button:hover {
-    background-color: #e0e0e0;
-  }
-
-  .confirm-button {
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 1em;
-    background-color: #5a5e5b;     /* Green for confirm */
-    color: #fff;
     transition: background-color 0.3s ease;
   }
 
-  .confirm-button:hover {
-    background-color: #02200f;     /* Darker green on hover */
+  .duration-button:hover {
+    background-color: var(--active-button-bg-color);
   }
+
+  .duration-button.active {
+    background-color: var(--active-button-bg-color);
+  }
+
+/* Affichage des boutons Investir et Retirer */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-button {
+  background: var(--action-button-bg-color);
+  color: var(--button-text-color);
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background: var(--action-button-hover-bg-color);
+}
+
+.action-button:disabled {
+  background: var(--action-button-disabled-bg-color);
+  cursor: not-allowed;
+}
+
+/* Affichage composant de saisie manuelle de montant à investir ou retirer */
+.action-form {
+  display: none;                  /* Hidden by default */
+  gap: 10px;                      /* Space between elements */
+  width: 100%;                    /* Full width */
+  max-width: 420px;               /* Optional: Limits the width */
+  background-color: var(--action-form-bg-color);
+  border: 2px solid var(--module-border-color);
+  border-radius: 6px;
+  position: relative;             /* For positioning the close icon */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 10px;
+}
+
+.action-form.show {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.close-icon {
+  color: var(--close-icon);
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-icon:hover {
+  color: var(--close-icon-hover);
+  text-decoration: none;
+}
+
+.action-amount {
+  border: none;              /* Removes the border */
+  outline: none;             /* Removes the focus outline (use with caution) */
+  text-align: right;
+  background: transparent;
+  padding: 8px;
+  font-size: 1em;
+}
+  /* Remove spinner controls in WebKit browsers */
+  .action-amount::-webkit-inner-spin-button,
+  .action-amount::-webkit-outer-spin-button {
+    -webkit-appearance: none; /* Removes the default appearance */
+    margin: 0;                /* Removes any default margin */
+  }
+  /* Remove spinner controls in Internet Explorer */
+  .action-amount::-ms-clear,
+  .action-amount::-ms-reveal {
+    display: none; /* Hides the clear and reveal buttons */
+  }
+
+.max-button {
+  padding: 8px 12px;
+  margin-left: 10px;
+  background-color: var(--max-button-bg-color);
+  color: var(--max-button-text-color);
+  border: 1px solid var(--max-button-border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.max-button:hover {
+  background-color: var(--max-button-hover-bg-color);
+  color: var(--max-button-hover-text-color);
+}
+
+.confirm-button {
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  transition: background-color 0.3s ease;
+}
+
+.confirm-button:hover {
+  background-color: var(--button-hover-bg-color);
+}
 
 /* Affichage des Overlay de transition*/
-  #overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Fond semi-transparent */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Au-dessus des autres éléments */
-  }
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-bg-color);  /* Fond semi-transparent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;                              /* Au-dessus des autres éléments */
+}
 
-  .overlay-content {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    text-align: center;
-    max-width: 400px;
-    width: 80%;
-  }
+.overlay-content {
+  background-color: var(--overlay-content-bg);
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 80%;
+}
 
-  .overlay-continue-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin-top: 20px;
-  }
+.overlay-continue-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: var(--action-button-bg-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
 
-  .overlay-continue-button:hover {
-    background-color: #105c2f;
-  }
+.overlay-continue-button:hover {
+  background-color: var(--action-button-hover-bg-color);
+}
 
 /* Responsive adjustments */
 @media (max-width: 800px) {
@@ -357,5 +398,9 @@
   .action-button {
     width: 100%;
     margin-right: 0;
+  }
+
+  .action-form {
+    max-width: 100%;
   }
 }

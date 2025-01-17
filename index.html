@@ -34,72 +34,71 @@
     <div class="modules-container">
 
       <!-- Module livret A -->
-      <div class="module">
+      <div class="module" data-module="livretA">
         <h2>Livret A</h2>
 
         <div class="toggle-container">
-          <button id="toggle-view-livretA" class="toggle-button active">
-            <img src="pictures/down-arrow.png" alt="Toggle View"> 
-            <!-- source: "https://www.flaticon.com/free-icons/down-arrow" title="down arrow icons">Down arrow icons created by Smartline - Flaticon -->
+          <button id="toggle-view-livretA" class="toggle-button active" aria-expanded="true" aria-controls="livretA-toggle-content">
+            <img src="pictures/down-arrow.png" alt="Toggle View">
           </button>
-            <div class="toggle-content">
-              <div id="livret-a-amount" class="module-amount active">0 € investis</div>
-              <div id="livret-a-profit" class="module-amount">0 € de profit</div>
-            </div>
+          <div id="livretA-toggle-content" class="toggle-content">
+            <div id="livret-a-amount" class="module-amount active">0 € investis</div>
+            <div id="livret-a-profit" class="module-amount">0 € de profit</div>
+          </div>
         </div>
 
         <div class="button-group">
-          <button id="invest-button-livretA" class="action-button" data-module="livretA" data-action="invest">Investir</button>
-          <button id="withdraw-button-livretA" class="action-button" data-module="livretA" data-action="withdraw">Retirer</button>      
-          <div class="action-form" data-module="livretA">
-            <span class="close-icon">&times;</span>
-            <input type="number" class="action-amount" placeholder="Montant" min="0">
-            <button class="max-button">MAX</button>
-            <button class="confirm-button">Confirmer</button>
-          </div>
+          <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Livret A">Investir</button>
+          <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer du Livret A">Retirer</button>
+        </div>
+
+        <div class="action-form hidden" data-action-form="livretA">
+          <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
+          <input type="number" class="action-amount" placeholder="Montant" min="0">
+          <button class="max-button">MAX</button>
+          <button class="confirm-button">Confirmer</button>
         </div>
       </div>
 
       <!-- Module actions (ETF) -->
-      <div class="module hidden" data-module="actions" id="module-actions" >
+      <div class="module hidden" data-module="actions">
         <h2>Actions</h2>
 
         <div class="toggle-container">
-          <button id="toggle-view-actions" class="toggle-button active">
-            <img src="pictures/down-arrow.png" alt="Toggle View"> 
-            <!-- source: "https://www.flaticon.com/free-icons/down-arrow" title="down arrow icons">Down arrow icons created by Smartline - Flaticon -->
+          <button id="toggle-view-actions" class="toggle-button active" aria-expanded="true" aria-controls="actions-toggle-content">
+            <img src="pictures/down-arrow.png" alt="Toggle View">
           </button>
-            <div class="toggle-content">
-              <div id="actions-amount" class="module-amount active">0 € investis</div>
-              <div id="actions-profit" class="module-amount">0 € de profit</div>
-            </div>
+          <div id="actions-toggle-content" class="toggle-content">
+            <div id="actions-amount" class="module-amount active">0 € investis</div>
+            <div id="actions-profit" class="module-amount">0 € de profit</div>
+          </div>
         </div>
 
         <div class="button-group">
-          <button id="invest-button-actions" class="action-button" data-module="actions" data-action="invest">Investir</button>
-          <button id="withdraw-button-actions" class="action-button" data-module="actions" data-action="withdraw">Retirer</button>
-      
-          <div class="action-form" data-module="actions">
-            <span class="close-icon">&times;</span>
-            <input type="number" class="action-amount" placeholder="Montant" min="0">
-            <button class="max-button">MAX</button>
-            <button class="confirm-button">Confirmer</button>
-          </div>
+          <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actions">Investir</button>
+          <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Actions">Retirer</button>
+        </div>
+
+        <div class="action-form hidden" data-action-form="actions">
+          <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
+          <input type="number" class="action-amount" placeholder="Montant" min="0">
+          <button class="max-button">MAX</button>
+          <button class="confirm-button">Confirmer</button>
         </div>
       </div>
 
       <!-- Module obligations -->
-      <div class="module ">
+      <div class="module" data-module="obligations">
         <h2>Obligations</h2>
         <div id="obligations-amount" class="module-amount active">0 € investis</div>
         <div class="button-group">
-          <button id="invest-button-obligations" class="action-button" data-module="obligations" data-action="invest">Investir</button>
-          <button id="withdraw-button-obligations" class="action-button" data-module="obligations" data-action="withdraw">Retirer</button>
+          <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Obligations">Investir</button>
+          <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Obligations">Retirer</button>
         </div>
       </div>
 
       <!-- Module résidence principale -->
-      <div class="module " data-module="residencePrincipale" id="module-residencePrincipale">
+      <div class="module" data-module="residencePrincipale">
         <h2>Résidence Principale</h2>
 
         <!-- État 1: Non investi -->
@@ -109,7 +108,7 @@
             <p><strong>Argent nécessaire :</strong> <span id="residence-argentNecessaire">10 000 €</span></p>
           </div>
           <div class="button-group">
-            <button id="invest-button-residence" class="action-button" data-module="residencePrincipale" data-action="invest">Investir</button>
+            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Résidence Principale">Investir</button>
           </div>
         </div>
 
@@ -120,26 +119,26 @@
             <p><strong>Taille :</strong> <span id="residence-taille">50</span> m²</p>
           </div>
           <div class="toggle-container">
-            <button id="toggle-view-residence" class="toggle-button active">
+            <button id="toggle-view-residence" class="toggle-button active" aria-expanded="true" aria-controls="residence-toggle-content">
               <img src="pictures/down-arrow.png" alt="Toggle View">
             </button>
-            <div class="toggle-content">
+            <div id="residence-toggle-content" class="toggle-content">
               <div id="residence-investedAmount" class="module-amount active">10 000 € investis</div>
               <div id="residence-profit" class="module-amount">0 € de profit</div>
             </div>
           </div>
           <div class="button-group">
-            <button id="sell-button-residence" class="action-button" data-module="residencePrincipale" data-action="sell">Vendre</button>
+            <button class="action-button sell-button" data-action="sell" aria-label="Vendre Résidence Principale">Vendre</button>
           </div>
         </div>
       </div>
 
       <!-- Module Actifs alternatifs -->
-      <div class="module" data-module="actifsAlternatifs" id="module-actifsAlternatifs">
+      <div class="module" data-module="actifsAlternatifs">
         <h2>Actifs Alternatifs</h2>
 
         <!-- État 1: Par défaut -->
-        <div class="actifs-state state-1 ">
+        <div class="actifs-state-1">
           <div class="info">
             <ul id="actifs-investedAmounts">
               <!-- Les investissements sont ajoutés ici dynamiquement -->
@@ -147,19 +146,19 @@
             <p><strong>Profits Cumulés :</strong> <span id="actifs-totalProfit">0 €</span></p>
           </div>
           <div class="button-group">
-            <button id="invest-button-actifs" class="action-button" data-module="actifsAlternatifs" data-action="invest">Investir</button>
+            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actifs Alternatifs">Investir</button>
           </div>
         </div>
 
         <!-- État 2: Choix de la durée -->
-        <div class="actifs-state state-2 hidden">
+        <div class="actifs-state-2 hidden">
           <div class="button-group duration-buttons">
-            <button class="duration-button" data-duration="3">3 ans</button>
-            <button class="duration-button" data-duration="7">7 ans</button>
+            <button class="duration-button" data-duration="3" aria-pressed="false">3 ans</button>
+            <button class="duration-button" data-duration="7" aria-pressed="false">7 ans</button>
           </div>
-          <div class="action-form" data-module="actifsAlternatifs">
-            <span class="close-icon">&times;</span>
-            <input type="number" class="action-amount" placeholder="Montant" min="10000">
+          <div class="action-form hidden" data-action-form="actifsAlternatifs">
+            <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
+            <input type="number" class="action-amount" placeholder="Montant (min 10 000 €)" min="10000" step="1000">
             <button class="max-button">MAX</button>
             <button class="confirm-button">Confirmer</button>
           </div>
@@ -171,9 +170,9 @@
   </div>
 
   <!-- Overlay pour les transitions -->
-  <div id="overlay" class="hidden">
+  <div id="overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
     <div class="overlay-content">
-      <h2>Bienvenue dans la Deuxième Année !</h2>
+      <h2 id="overlay-title">Bienvenue dans la Deuxième Année !</h2>
       <p>Vous avez maintenant accès aux Actions.</p>
       <button id="continue-button" class="overlay-continue-button">Continuer</button>
     </div>

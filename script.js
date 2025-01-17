@@ -1,493 +1,264 @@
+// script.js
+
 // Importation des données
 import { MonthlyLivretAReturns } from './livretA_rates.js';
 import { MonthlyActionsReturns } from './actions_rates.js';
 
-// Initialisation des variables communes
-const initialAge = 22;
-const totalYears = 20;      // Durée de la simulation en années
-let currentYearIndex = 1;   // 1 = première année
-let currentMonthIndex = 0;  // 0 = premier mois
-let gameInterval;           // Variable pour stocker l'intervalle du jeu
-let availableMoney = 100000; // Argent disponible initial
+// Classe pour gérer chaque module d'investissement
+class InvestmentModule {
+  constructor(moduleName, options = {}) {
+    this.moduleName = moduleName;
+    this.element = document.querySelector(`.module[data-module="${moduleName}"]`);
+    this.investButton = this.element.querySelector('.invest-button');         // Pour les modules avec un bouton "Investir"
+    this.withdrawButton = this.element.querySelector('.withdraw-button');     // Pour les modules avec un bouton "Retirer"
+    this.actionForm = this.element.querySelector('.action-form');             // Pour les modules avec un formulaire de validation de montant à investir ou retirer
+      this.closeIcon = this.actionForm?.querySelector('.close-icon');           
+      this.actionAmountInput = this.actionForm?.querySelector('.action-amount');
+      this.maxButton = this.actionForm?.querySelector('.max-button');           
+      this.confirmButton = this.actionForm?.querySelector('.confirm-button');
+    this.toggleButton = this.element.querySelector('.toggle-button');         // Pour les modules avec un affichage au choix du montant investi ou des profits
+      this.toggleContent = this.element.querySelector('.toggle-content');
+      this.amountEl = this.element.querySelector('.module-amount.active');
+      this.profitEl = this.element.querySelector('.module-amount:not(.active)');
+    this.sellButton = this.element.querySelector('.sell-button');             // Pour le module résidence principale
+    this.durationButtons = this.element.querySelectorAll('.duration-button'); // Pour les boutons de durée du mocule actifs alternatifs
+      this.durationSelected = 3;                                              // Durée par défaut pour le mocule actifs alternatifs
 
-// Initialisation des variables pour le module livret A
-let livretA = 0;
-let livretAProfit = 0;
-const MAX_LIVRET_A = 9950;
-
-// Initialisation des variables pour le module obligations
-let obligations = 0;
-let obligationsProfit = 0;
-
-// Initialisation des variables pour le module actions
-let actions = 0;
-let actionsProfit = 0;
-
-// Initialisation des variables pour le module résidence Principale
-let residenceInvested = false;
-let residenceInvestedAmount = 0;
-let residenceProfit = 0;
-const residenceSurfaceCible = 50;         // Montant en m2 par défaut avant création table
-const residenceArgentNecessaire = 10000;  // Montant en € par défaut avant création table
-
-// Initialisation des variables pour le module actifs alternatifs
-let actifsAlternatifsInvestments = [];    // Tableau pour stocker les investissements
-let actifsAlternatifsTotalProfit = 0;
-const MAX_ACTIFS_INVESTMENTS = 3;
-const ACTIVITE_ALTERNATIF_MIN_INVEST = 10000;
-
-// Construction des tables de rendements mensualisés
-// Dates de début comprises entre 1980-01 et 2004-01 pour une partie de 20 ans et des données allant de 1980-01 à 2023-12
-const randomYear = Math.floor(Math.random() * (2004 - 1980 + 1)) + 1980;
-const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
-const TARGET_START_DATE = `${randomYear}-${randomMonth}`;
-const NUMBER_OF_ENTRIES = totalYears * 12;
-  /**
-  * Trouve l'index de la date cible dans un tableau de rendements mensuels.
-  * @param {Array} returns - Tableau des rendements mensuels [date, taux].
-  * @param {string} targetDate - Date cible au format "YYYY-MM".
-  * @returns {number} - Index de la date cible ou -1 si non trouvé.
-  */
-  function findStartIndex(returns, targetDate) {
-   return returns.findIndex(entry => entry[0] === targetDate);
-  }
-  // Table de rendements du Livret A mensualisés
-  const LivretAStartIndex = findStartIndex(MonthlyLivretAReturns, TARGET_START_DATE);
-  const LivretAEndIndex = LivretAStartIndex + NUMBER_OF_ENTRIES;
-  const LivretASelectedEntries = MonthlyLivretAReturns.slice(LivretAStartIndex, LivretAEndIndex);
-  const monthlyLivretARates = LivretASelectedEntries.map(entry => entry[1]);
-  // Table de rendements du module Actions (S&P 500) mensualisés
-  const ActionsStartIndex = findStartIndex(MonthlyActionsReturns, TARGET_START_DATE);
-  const ActionsEndIndex = ActionsStartIndex + NUMBER_OF_ENTRIES;
-  const ActionsSelectedEntries = MonthlyActionsReturns.slice(ActionsStartIndex, ActionsEndIndex);
-  const monthlyActionsRates = ActionsSelectedEntries.map(entry => entry[1]);
-
-// Références aux éléments du DOM
-  const currentYearEl = document.getElementById('current-year');
-  const availableMoneyEl = document.getElementById('available-money');
-  const totalWealthEl = document.getElementById('total-wealth');
-
-  const livretAEl = document.getElementById('livret-a-amount');
-  const livretAProfitEl = document.getElementById('livret-a-profit');
-  const investButtonLivretA = document.getElementById('invest-button-livretA');
-  const withdrawButtonLivretA = document.getElementById('withdraw-button-livretA');
-
-  const obligationsEl = document.getElementById('obligations-amount');
-  const investButtonObligations = document.getElementById('invest-button-obligations');
-  const withdrawButtonObligations = document.getElementById('withdraw-button-obligations');
-
-  const actionsEl = document.getElementById('actions-amount');
-  const actionsProfitEl = document.getElementById('actions-profit');
-  const investButtonActions = document.getElementById('invest-button-actions');
-  const withdrawButtonActions = document.getElementById('withdraw-button-actions');
-
-  const residenceEL= document.getElementById('residence-investedAmount');
-  const residenceProfitEL= document.getElementById('residence-profit');
-
-  const investButtonActifs = document.getElementById('invest-button-actifs');
-  const actifsInvestedAmountsEl = document.getElementById('actifs-investedAmounts');
-  const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
-
-  const overlay = document.getElementById('overlay');
-  const continueButton = document.getElementById('continue-button');
-
-// Mise à jour de l'interface utilisateur avec les nouvelles valeurs
-function updateUI() {
-
-  const age = initialAge + currentYearIndex - 1;
-
-  // MAJ Dashboard
-  currentYearEl.innerHTML = `
-  <span class="dashboard-title">Année</span>
-  <span class="dashboard-amount">${currentYearIndex}</span> 
-  <span class="dashboard-title">sur</span> 
-  <span class="dashboard-amount">${totalYears}</span>
-  `;
-  availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
-  const totalWealth = availableMoney + livretA + obligations + actions;
-  totalWealthEl.textContent = `€${totalWealth.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
-
-  // MAJ module livret A
-  livretAEl.textContent = `€${livretA.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
-  livretAProfitEl.textContent = `€${livretAProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
-  withdrawButtonLivretA.style.display = (livretA < 0.01) ? 'none' : 'inline-block';
-  if (livretA >= MAX_LIVRET_A) {investButtonLivretA.disabled = true;} else {investButtonLivretA.disabled = false;}
-
-  // MAJ module obligations
-  obligationsEl.textContent = `€${obligations.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
-  withdrawButtonObligations.style.display = (obligations < 100) ? 'none' : 'inline-block';
-
-  // MAJ module actions
-  actionsEl.textContent = `€${actions.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
-  actionsProfitEl.textContent = `€${actionsProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
-  withdrawButtonActions.style.display = (actions < 100) ? 'none' : 'inline-block';
-
-  // MAJ module résidence principale
-  document.getElementById('residence-age').textContent = age;
-  document.getElementById('residence-taille').textContent = residenceSurfaceCible;
-
-  if (residenceInvested) {
-    document.getElementById('residence-investedAmount').textContent = `${residenceInvestedAmount.toLocaleString('fr-FR')} € investis`;
-    document.getElementById('residence-profit').textContent = `${residenceProfit.toLocaleString('fr-FR')} € de profit`;
+    // Options pour comportements spécifiques
+    this.customInvestHandler = options.customInvestHandler || null;
+    this.customWithdrawHandler = options.customWithdrawHandler || null;
+    
+    // Initialisation spécifique selon le module
+    this.init();
   }
 
-  // MAJ module actifs alternatifs
-  if (availableMoney < ACTIVITE_ALTERNATIF_MIN_INVEST) {investButtonActifs.disabled = true;} else {investButtonActifs.disabled = false;}
-
-}
-
-// Gestion des interactions des modules livret A et actions
-document.addEventListener('DOMContentLoaded', () => {
-
-  // Affichage montant investis / profits livret A
-  const toggleButtonLivretA = document.getElementById('toggle-view-livretA');
-  toggleButtonLivretA.addEventListener('click', () => {
-    const isAmountVisible = livretAEl.classList.contains('active');
-    if (isAmountVisible) {
-      livretAEl.classList.remove('active');
-      livretAProfitEl.classList.add('active');
-    } else {
-      livretAProfitEl.classList.remove('active');
-      livretAEl.classList.add('active');
+  init() {
+    // Gestionnaire pour les boutons Investir (livret A, Actions)
+    if (this.investButton) {
+      if (this.customInvestHandler) {
+        this.investButton.addEventListener('click', this.customInvestHandler);          // Pour le module obligations
+      } else {
+        this.investButton.addEventListener('click', () => this.openActionForm('invest'));
+      }
     }
-  });
 
-  // Affichage montant investis / profits actions
-  const toggleButtonActions = document.getElementById('toggle-view-actions');
-  toggleButtonActions.addEventListener('click', () => {
-    const isAmountVisible = actionsEl.classList.contains('active');
-    if (isAmountVisible) {
-      actionsEl.classList.remove('active');
-      actionsProfitEl.classList.add('active');
-    } else {
-      actionsProfitEl.classList.remove('active');
-      actionsEl.classList.add('active');
+    // Gestionnaire pour Retirer (livret A, Actions)
+    if (this.withdrawButton) {
+      if (this.customWithdrawHandler) {
+        this.withdrawButton.addEventListener('click', this.customWithdrawHandler);      // Pour le module obligations
+      } else {
+        this.withdrawButton.addEventListener('click', () => this.openActionForm('withdraw'));
+      }
     }
-  });
 
-  // Gestion des clics sur les boutons "Investir" et "Retirer" du module du livret A et du module Actions
-  document.querySelectorAll('.action-button[data-module="livretA"][data-action="invest"], .action-button[data-module="livretA"][data-action="withdraw"], .action-button[data-module="actions"][data-action="invest"], .action-button[data-module="actions"][data-action="withdraw"]').forEach(button => {
-    button.addEventListener('click', () => {
-      openActionForm(button);
-    });
-  });
-
-  /**
-  * Ouvre le formulaire d'action pour définir le montant à investir ou retirer des modules livret A et Actions
-  * @param {HTMLElement} button - Le bouton cliqué.
-  */
-  function openActionForm(button) {
-    // Trouver le bouton parent
-    const module = button.getAttribute('data-module');
-    const action = button.getAttribute('data-action');
-    // Trouver le module parent
-    const moduleElement = button.closest('.module');
-    // Trouver le formulaire parent
-    const actionForm = moduleElement.querySelector('.action-form');
-    
-    // Masquer les boutons Investir et Retirer
-    const investButton = moduleElement.querySelector(`.action-button[data-action="invest"]`);
-    const withdrawButton = moduleElement.querySelector(`.action-button[data-action="withdraw"]`);
-    investButton.classList.add('hidden');
-    withdrawButton.classList.add('hidden');
-
-    // Trouver les éléments dans le formulaire parent
-    const actionFormClose = actionForm.querySelector('.close-icon');
-    const actionAmountInput = actionForm.querySelector('.action-amount');
-    const actionMaxButton = actionForm.querySelector('.max-button');
-    const actionConfirmButton = actionForm.querySelector('.confirm-button');
-
-    // Afficher et configurer le formulaire
-    actionForm.classList.add('show');
-    actionAmountInput.value = '';
-    actionAmountInput.placeholder = `Montant`;
-    actionAmountInput.focus();
-    
-    // Gestionnaire pour fermer le formulaire via la croix
-    actionFormClose.onclick = () => {
-      closeActionForm(actionForm, investButton, withdrawButton);
-    };
-  
-    // Gestionnaire pour fermer le formulaire en cliquant en dehors
-    document.addEventListener('click', function handleOutsideClick(event) {
-      if (!actionForm.contains(event.target) && !button.contains(event.target)) {
-        closeActionForm(actionForm, investButton, withdrawButton);
-        document.removeEventListener('click', handleOutsideClick);
+    // Gestionnaire pour Vendre (Résidence Principale)
+    if (this.sellButton) {
+      if (this.customWithdrawHandler && this.moduleName === 'residencePrincipale') {
+        this.sellButton.addEventListener('click', this.customWithdrawHandler);
       }
-    });
-  
-    // Gestionnaire du bouton MAX
-    actionMaxButton.onclick = () => {
-      let maxAmount = 0;
-      if (action === 'invest') {
-        if (module === 'livretA') {
-          maxAmount = Math.min(availableMoney, MAX_LIVRET_A - livretA);
-        } else if (module === 'actions') {
-          maxAmount = availableMoney;
-        }
-      } else if (action === 'withdraw') {
-        if (module === 'livretA') {
-          maxAmount = livretA;
-        } else if (module === 'actions') {
-          maxAmount = actions;
-        }
-      }
-      maxAmount = Math.max(maxAmount, 0);
-      actionAmountInput.value = maxAmount;
-    };
-  
-    // Gestionnaire pour la confirmation de l'action
-    actionConfirmButton.onclick = () => {
-      const amount = parseFloat(actionAmountInput.value);
-    
-      if (isNaN(amount) || amount <= 0) {
-        alert("Veuillez entrer un montant valide (supérieur à 0).");
-        return;
-      }
-      
-      if (action === 'invest') {
-        if (module === 'livretA') {
-          if (livretA >= MAX_LIVRET_A) {
-            alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
-            return;
-          }
+    }
 
-          if (livretA + amount > MAX_LIVRET_A) {
-            const montantPossible = MAX_LIVRET_A - livretA;
-            alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
-            return;
-          }
-        }
-        if (availableMoney >= amount) {
-          availableMoney -= amount;
-          if (module === 'livretA') {
-            livretA += amount;
-          } else if (module === 'actions') {
-            actions += amount;
-          }
-          updateUI();
-          closeActionForm(actionForm, investButton, withdrawButton);
+    // Gestionnaire pour Fermer le Formulaire
+    if (this.closeIcon && this.actionForm) {
+      this.closeIcon.addEventListener('click', () => this.closeActionForm());
+    }
+
+    // Gestionnaire pour le bouton MAX
+    if (this.maxButton) {
+      this.maxButton.addEventListener('click', () => this.setMaxAmount());
+    }
+
+    // Gestionnaire pour Confirmer l'Action
+    if (this.confirmButton) {
+      this.confirmButton.addEventListener('click', () => this.confirmAction());
+    }
+
+    // Gestionnaire pour le Toggle de Montant/Profit
+    if (this.toggleButton) {
+      this.toggleButton.addEventListener('click', () => this.toggleAmountProfit());
+    }
+
+    // Gestion des Durées (pour Actifs Alternatifs)
+    if (this.durationButtons.length > 0) {
+      this.durationButtons.forEach(button => {
+        button.addEventListener('click', () => this.selectDuration(button));
+      });
+    }
+
+    // Chargement des données depuis localStorage
+    this.loadData();
+  }
+
+  // Ouvre le formulaire d'action avec l'action spécifiée (invest, withdraw)
+  openActionForm(actionType) {
+    // Masquer les boutons Investir/Retirer si nécessaire
+    if (actionType === 'invest' || actionType === 'withdraw' || actionType === 'sell') {
+      if (this.investButton) this.investButton.classList.add('hidden');
+      if (this.withdrawButton) this.withdrawButton.classList.add('hidden');
+    }
+
+    // Définir l'attribut 'data-action-type' sur le bouton Confirmer
+    if (this.confirmButton) {
+      this.confirmButton.setAttribute('data-action-type', actionType);
+    }
+
+    // Afficher le formulaire d'action
+    this.actionForm.classList.remove('hidden');
+    this.actionForm.classList.add('show');
+    this.actionAmountInput.value = '';
+    this.actionAmountInput.focus();
+
+    // Gestion spécifique pour Actifs Alternatifs
+    if (this.moduleName === 'actifsAlternatifs') {
+      this.actionAmountInput.value = '10000';
+      this.element.querySelector('.actifs-state-1').classList.add('hidden');
+      this.element.querySelector('.actifs-state-2').classList.remove('hidden');
+      // Pré-sélectionner la durée de 3 ans
+      this.durationSelected = 3;
+      this.durationButtons.forEach(button => {
+        const duration = parseInt(button.getAttribute('data-duration'), 10);
+        if (duration === 3) {
+          button.classList.add('active');
+          button.setAttribute('aria-pressed', 'true');
         } else {
-          alert("Pas assez d'argent disponible pour investir !");
+          button.classList.remove('active');
+          button.setAttribute('aria-pressed', 'false');
         }
-      } else if (action === 'withdraw') {
-        if (module === 'livretA') {
-          if (livretA >= amount) {
-            livretA -= amount;
-            availableMoney += amount;
-            updateUI();
-            closeActionForm(actionForm, investButton, withdrawButton);
-          } else {
-            alert("Pas assez d'argent sur le Livret A pour retirer !");
-          }
-        } else if (module === 'actions') {
-          if (actions >= amount) {
-            actions -= amount;
-            availableMoney += amount;
-            updateUI();
-            closeActionForm(actionForm, investButton, withdrawButton);
-          } else {
-            alert("Pas assez d'argent sur les Actions pour retirer !");
-          }
-        }
+      });
+    }
+  }
+
+  // Ferme le formulaire d'action et réaffiche les boutons Investir/Retirer
+  closeActionForm() {
+    this.actionForm.classList.remove('show');
+    this.actionForm.classList.add('hidden');
+    if (this.investButton) this.investButton.classList.remove('hidden');
+    if (this.withdrawButton) this.withdrawButton.classList.remove('hidden');
+
+    // Gestion spécifique pour Actifs Alternatifs
+    if (this.moduleName === 'actifsAlternatifs') {
+      this.element.querySelector('.actifs-state-1').classList.remove('hidden');
+      this.element.querySelector('.actifs-state-2').classList.add('hidden');
+    }
+  }
+
+  // Définit le montant maximal disponible pour l'action
+  setMaxAmount() {
+    let maxAmount = 0;
+    const actionType = this.confirmButton.getAttribute('data-action-type'); // Custom attribute to store action type
+    if (actionType === 'invest') {
+      if (this.moduleName === 'livretA') {
+        maxAmount = Math.min(availableMoney, MAX_LIVRET_A - livretA);
+      } else if (this.moduleName === 'actions') {
+        maxAmount = availableMoney;
+      } else if (this.moduleName === 'actifsAlternatifs') {
+        maxAmount = Math.max(availableMoney, ACTIVITE_ALTERNATIF_MIN_INVEST);
       }
-    }
-  };
-
-  /**
-   * Ferme le formulaire d'action et affiche les boutons Investir et Retirer.
-   * @param {HTMLElement} actionForm - Le formulaire d'action à fermer.
-   * @param {HTMLElement} investButton - Le bouton Investir à réafficher.
-   * @param {HTMLElement} withdrawButton - Le bouton Retirer à réafficher.
-   */
-  function closeActionForm(actionForm, investButton, withdrawButton) {
-    actionForm.classList.remove('show');
-    investButton.classList.remove('hidden');
-    withdrawButton.classList.remove('hidden');
+    } else if (actionType === 'withdraw') {
+      if (this.moduleName === 'livretA') {
+        maxAmount = livretA;
+      } else if (this.moduleName === 'actions') {
+        maxAmount = actions;
+      }
+    } 
+    maxAmount = Math.max(maxAmount, 0);
+    maxAmount = Math.floor(maxAmount * 100) / 100;
+    this.actionAmountInput.value = maxAmount.toFixed(2);
   }
 
-});
+  // Confirme l'action (investir, retirer, vendre)
+  confirmAction() {
+    const amount = parseFloat(this.actionAmountInput.value);
+    const actionType = this.confirmButton.getAttribute('data-action-type'); // Custom attribute to store action type
 
-// Gestion d'événements sur le module obligations
-investButtonObligations.addEventListener('click', () => {
-  const investAmount = 100;
-  if (availableMoney >= investAmount) {
-    availableMoney -= investAmount;
-    obligations += investAmount;
-    updateUI();
-  } else {
-    alert("Pas assez d'argent disponible pour investir !");
-  }
-});
-
-withdrawButtonObligations.addEventListener('click', () => {
-  const withdrawAmount = 100;
-  if (obligations >= withdrawAmount) {
-    obligations -= withdrawAmount;
-    availableMoney += withdrawAmount;
-    updateUI();
-  } else {
-    alert("Pas assez d'argent sur les Obligations pour retirer !");
-  }
-});
-
-// Gestion d'événements sur le module résidence principale.
-
-  // Affichage montant investis / profits residence principale
-  const toggleButtonResidence = document.getElementById('toggle-view-residence');
-  toggleButtonResidence.addEventListener('click', () => {
-    const isAmountVisible = residenceEL.classList.contains('active');
-    if (isAmountVisible) {
-      residenceEL.classList.remove('active');
-      residenceProfitEL.classList.add('active');
-    } else {
-      residenceProfitEL.classList.remove('active');
-      residenceEL.classList.add('active');
-    }
-  });
-  
-  document.getElementById('invest-button-residence').addEventListener('click', () => {
-    investResidence();
-  });
-
-  document.getElementById('sell-button-residence').addEventListener('click', () => {
-    sellResidence();
-  });
-
-  function investResidence() {
-    if (availableMoney >= residenceArgentNecessaire) {
-      availableMoney -= residenceArgentNecessaire;
-      residenceInvested = true;
-      residenceInvestedAmount = residenceArgentNecessaire;
-      residenceProfit = 0;
-      document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.add('hidden');
-      document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.remove('hidden');
-      updateUI();
-    } else {
-      alert("Pas assez d'argent disponible pour investir dans la résidence principale !");
-    }
-  }
-
-  function sellResidence() {
-    const totalRecovered = residenceInvestedAmount + residenceProfit;
-    availableMoney += totalRecovered;
-    residenceInvested = false;
-    residenceInvestedAmount = 0;
-    residenceProfit = 0;
-    document.querySelector('#module-residencePrincipale .residence-state.state-1').classList.remove('hidden');
-    document.querySelector('#module-residencePrincipale .residence-state.state-2').classList.add('hidden');
-    updateUI();
-  }
-
-// Gestion d'événements sur le module actifs alternatifs.
-
-  // Gestion des clics sur le bouton "Investir" du module Actifs Alternatifs
-  investButtonActifs.addEventListener('click', () => {
-    openActifsActionForm();
-  });
-
-  // Ouvre le formulaire d'action pour investir dans Actifs Alternatifs.
-  function openActifsActionForm() {
-    if (actifsAlternatifsInvestments.length >= MAX_ACTIFS_INVESTMENTS) {
-      alert("Vous avez atteint le nombre maximum d'investissements dans les Actifs Alternatifs.");
+    if (isNaN(amount) || amount <= 0) {
+      alert("Veuillez entrer un montant valide (supérieur à 0).");
       return;
     }
 
-    // Masquer l'état 1 et afficher l'état 2 du module Actifs Alternatifs
-    const moduleElement = document.getElementById('module-actifsAlternatifs');
-    moduleElement.querySelector('.actifs-state.state-1').classList.add('hidden');
-    const state2 = moduleElement.querySelector('.actifs-state.state-2');
-    state2.classList.remove('hidden');
-    
-    // Initialiser la durée du placement par défaut à 3 ans
-    const durationButton3 = state2.querySelector('.duration-button[data-duration="3"]');
-    if (durationButton3) {
-      durationButton3.click();
+    switch (this.moduleName) {
+      case 'livretA':
+        this.handleLivretAAction(amount, actionType);
+        break;
+      case 'actions':
+        this.handleActionsAction(amount, actionType);
+        break;
+      case 'actifsAlternatifs':
+        this.handleActifsAlternatifsAction(amount);
+        break;
+      default:
+        console.warn(`Action non gérée pour le module: ${this.moduleName}`);
     }
-
-    // Initialiser le formulaire pour remplir le montant à investir
-    const actionForm = state2.querySelector('.action-form');
-    actionForm.classList.add('show');
-    const actionAmountInput = actionForm.querySelector('.action-amount');
-    actionAmountInput.value = '10000';
-
-    // Gestion du bouton "MAX"
-    const actionMaxButton = actionForm.querySelector('.max-button');
-    actionMaxButton.onclick = () => {
-        const maxAmount = availableMoney >= ACTIVITE_ALTERNATIF_MIN_INVEST ? availableMoney : 0;
-        actionAmountInput.value = maxAmount.toFixed(2);
-    };
-    
-    // Options de fermeture du formulaire via la croix
-    const closeIcon = actionForm.querySelector('.close-icon');
-    closeIcon.onclick = () => {
-      closeActifsActionForm();
-    };
-
   }
 
-  // Ferme le formulaire d'action pour investir dans Actifs Alternatifs.
-  function closeActifsActionForm() {
-    const moduleElement = document.getElementById('module-actifsAlternatifs');
-    const state2 = moduleElement.querySelector('.actifs-state.state-2');
-    const actionForm = state2.querySelector('.action-form');
-    
-    // Masquer le formulaire d'action
-    actionForm.classList.remove('show');
-    
-    // Réafficher l'état 1 et masquer l'état 2
-    moduleElement.querySelector('.actifs-state.state-1').classList.remove('hidden');
-    state2.classList.add('hidden');
-  }
-
-  /**
- * Gestion des clics sur les boutons de durée du module Actifs Alternatifs
- */
-  const durationButtons = document.querySelectorAll('#module-actifsAlternatifs .duration-button');
-  durationButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const duration = parseInt(button.getAttribute('data-duration'));
-      
-      const activeButton = document.querySelector('#module-actifsAlternatifs .duration-button.active');
-      if (activeButton && activeButton !== button) {
-        activeButton.classList.remove('active');
+  // Gestion spécifique pour Livret A
+  handleLivretAAction(amount, actionType) {
+    if (actionType === 'invest') {
+      if (livretA >= MAX_LIVRET_A) {
+        alert(`Vous avez atteint le plafond d'investissement dans le Livret A (${MAX_LIVRET_A.toFixed(2)} €).`);
+        return;
       }
-      button.classList.add('active');
-      
-      handleDurationChoice(duration); // Logique très moche mais qui marche
-    });
-  });
 
-  /**
- * Fonction intermédiaire et pas très élégante
- */
-  function handleDurationChoice(duration) {
-    const moduleElement = document.getElementById('module-actifsAlternatifs');
-    const state2 = moduleElement.querySelector('.actifs-state.state-2');
-    const actionForm = state2.querySelector('.action-form');
-    const actionAmountInput = actionForm.querySelector('.action-amount');
-    const actionConfirmButton = actionForm.querySelector('.confirm-button');
+      if (livretA + amount > MAX_LIVRET_A) {
+        const montantPossible = MAX_LIVRET_A - livretA;
+        alert(`Vous ne pouvez investir que ${montantPossible.toFixed(2)} € supplémentaires dans le Livret A.`);
+        return;
+      }
 
-    // Gestion du bouton "Confirmer"
-    actionConfirmButton.onclick = () => {
-      const amount = parseFloat(actionAmountInput.value);
-      confirmActifsInvestment(amount, duration);
-    };
-    
+      if (availableMoney >= amount) {
+        availableMoney -= amount;
+        livretA += amount;
+        saveData();
+        updateUI();
+        this.closeActionForm();
+      } else {
+        alert("Pas assez d'argent disponible pour investir !");
+      }
+    } else if (actionType === 'withdraw') {
+      if (livretA >= amount) {
+        livretA -= amount;
+        availableMoney += amount;
+        saveData();
+        updateUI();
+        this.closeActionForm();
+      } else {
+        alert("Pas assez d'argent sur le Livret A pour retirer !");
+      }
+    }
   }
-    
-  /**
- * Gère la confirmation de l'investissement dans Actifs Alternatifs.
- * @param {number} amount - Montant investi
- * @param {number} duration - Durée de l'investissement en années (3 ou 7)
- */
-  function confirmActifsInvestment(amount, duration) {
 
+  // Gestion spécifique pour Actions
+  handleActionsAction(amount, actionType) {
+    if (actionType === 'invest') {
+      if (availableMoney >= amount) {
+        availableMoney -= amount;
+        actions += amount;
+        saveData();
+        updateUI();
+        this.closeActionForm();
+      } else {
+        alert("Pas assez d'argent disponible pour investir !");
+      }
+    } else if (actionType === 'withdraw') {
+      if (actions >= amount) {
+        actions -= amount;
+        availableMoney += amount;
+        saveData();
+        updateUI();
+        this.closeActionForm();
+      } else {
+        alert("Pas assez d'argent sur les Actions pour retirer !");
+      }
+    }
+  }
+
+  // Gestion spécifique pour Actifs Alternatifs
+  handleActifsAlternatifsAction(amount) {
     if (isNaN(amount) || amount < ACTIVITE_ALTERNATIF_MIN_INVEST) {
       alert(`Veuillez entrer un montant valide (minimum ${ACTIVITE_ALTERNATIF_MIN_INVEST.toLocaleString('fr-FR')} €).`);
       return;
     }
-    
+
     if (availableMoney < amount) {
       alert("Pas assez d'argent disponible pour investir !");
       return;
@@ -495,7 +266,7 @@ withdrawButtonObligations.addEventListener('click', () => {
 
     const investment = {
       amount: amount,
-      duration: duration,
+      duration: this.durationSelected,
       startMonth: currentMonthIndex,
       profit: 0,
       id: Date.now() // Identifiant unique
@@ -503,74 +274,392 @@ withdrawButtonObligations.addEventListener('click', () => {
 
     actifsAlternatifsInvestments.push(investment);
     availableMoney -= amount;
-
     addActifsInvestmentToUI(investment);
-    closeActifsActionForm();
+    saveData();
     updateUI();
+    this.closeActionForm();
   }
 
-  /**
-  * Ajoute une ligne d'investissement dans l'interface utilisateur.
-  * @param {Object} investment - Objet d'investissement
-  */
-  function addActifsInvestmentToUI(investment) {
-    const li = document.createElement('li');
-    li.id = `actifs-investment-${investment.id}`;
-    li.innerHTML = `
-      <span>Investissement de ${investment.amount.toLocaleString('fr-FR')} € pour ${investment.duration} ans</span>
-      <span>Profit : ${investment.profit.toLocaleString('fr-FR')} €</span>
-    `;
-    actifsInvestedAmountsEl.appendChild(li);
-  }
-
-  /**
- * Met à jour les profits cumulés pour Actifs Alternatifs.
- */
-  function updateActifsProfits() {
-    actifsAlternatifsInvestments.forEach(investment => {
-      // Calculer le nombre de mois écoulés
-      const monthsElapsed = currentMonthIndex - investment.startMonth;
-      
-      // Vérifier si la durée est atteinte
-      if (monthsElapsed >= investment.duration * 12) {
-        // Ajouter le profit et retirer l'investissement
-        availableMoney += investment.amount + investment.profit;
-        // Supprimer l'investissement du tableau
-        actifsAlternatifsInvestments = actifsAlternatifsInvestments.filter(inv => inv.id !== investment.id);
-        // Supprimer la ligne de l'UI
-        const li = document.getElementById(`actifs-investment-${investment.id}`);
-        if (li) li.remove();
+  // Sélectionne la durée pour Actifs Alternatifs
+  selectDuration(button) {
+    this.durationSelected = parseInt(button.getAttribute('data-duration'));
+    this.durationButtons.forEach(btn => {
+      if (btn === button) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
       } else {
-        // Appliquer un rendement mensuel (exemple: 0.5%)
-        const monthlyRate = 0.005;
-        const interestEarned = investment.amount * monthlyRate;
-        investment.profit += interestEarned;
-        actifsAlternatifsTotalProfit += interestEarned;
-        
-        // Mettre à jour l'UI pour cette ligne
-        const li = document.getElementById(`actifs-investment-${investment.id}`);
-        if (li) {
-          li.querySelector('span:nth-child(2)').textContent = `Profit : ${investment.profit.toLocaleString('fr-FR')} €`;
-        }
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
       }
     });
-    
-    // Mettre à jour le total des profits
-    actifsTotalProfitEl.textContent = `${actifsAlternatifsTotalProfit.toLocaleString('fr-FR')} €`;
   }
 
+  // Toggle entre montant investi et profit
+  toggleAmountProfit() {
+    if (this.amountEl.classList.contains('active')) {
+      this.amountEl.classList.remove('active');
+      this.profitEl.classList.add('active');
+    } else {
+      this.profitEl.classList.remove('active');
+      this.amountEl.classList.add('active');
+    }
+  }
+
+  // Sauvegarde les données dans le localStorage
+  saveData() {
+    try {
+      localStorage.setItem(`${this.moduleName}Investments`, JSON.stringify(actifsAlternatifsInvestments));
+    } catch (error) {
+      console.error(`Erreur lors de la sauvegarde des données pour ${this.moduleName}:`, error);
+    }
+  }
+
+  // Charge les données depuis le localStorage
+  loadData() {
+    try {
+      const data = localStorage.getItem(`${this.moduleName}Investments`);
+      if (data) {
+        actifsAlternatifsInvestments = JSON.parse(data);
+        // Recréer les lignes d'investissement dans l'UI
+        actifsAlternatifsInvestments.forEach(investment => {
+          addActifsInvestmentToUI(investment);
+        });
+        // Mettre à jour le total des profits
+        calculateActifsTotalProfit();
+      }
+    } catch (error) {
+      console.error(`Erreur lors du chargement des données pour ${this.moduleName}:`, error);
+    }
+  }
+}
+
+// Variables globales
+const initialAge = 22;
+const totalYears = 20;      // Durée de la simulation en années
+let currentYearIndex = 1;   // 1 = première année
+let currentMonthIndex = 0;  // 0 = premier mois
+let gameInterval;           // Variable pour stocker l'intervalle du jeu
+let availableMoney = 100000; // Argent disponible initial
+
+// Variables pour les modules spécifiques
+let livretA = 0;
+let livretAProfit = 0;
+const MAX_LIVRET_A = 9950;
+
+let obligations = 0;
+let obligationsProfit = 0;
+
+let actions = 0;
+let actionsProfit = 0;
+
+let residenceInvested = false;
+let residenceInvestedAmount = 0;
+let residenceProfit = 0;
+const residenceSurfaceCible = 50;         // Surface en m² par défaut (à rendre dynamique)
+const residenceArgentNecessaire = 10000;  // Argent en € par défaut (à rendre dynamique)
+
+let actifsAlternatifsInvestments = [];    // Tableau pour stocker les investissements
+let actifsAlternatifsTotalProfit = 0;
+const MAX_ACTIFS_INVESTMENTS = 3;
+const ACTIVITE_ALTERNATIF_MIN_INVEST = 10000;
+
+// Tables de rendements mensuels
+const randomYear = Math.floor(Math.random() * (2004 - 1980 + 1)) + 1980;
+const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+const TARGET_START_DATE = `${randomYear}-${randomMonth}`;
+const NUMBER_OF_ENTRIES = totalYears * 12;
+
+  /**
+   * Trouve l'index de la date cible dans un tableau de rendements mensuels.
+   * @param {Array} returns - Tableau des rendements mensuels [date, taux].
+   * @param {string} targetDate - Date cible au format "YYYY-MM".
+   * @returns {number} - Index de la date cible ou -1 si non trouvé.
+   */
+  function findStartIndex(returns, targetDate) {
+    return returns.findIndex(entry => entry[0] === targetDate);
+  }
+
+  // Table de rendements du Livret A mensualisés
+  const LivretAStartIndex = findStartIndex(MonthlyLivretAReturns, TARGET_START_DATE);
+  const LivretAEndIndex = LivretAStartIndex + NUMBER_OF_ENTRIES;
+  const LivretASelectedEntries = MonthlyLivretAReturns.slice(LivretAStartIndex, LivretAEndIndex);
+  const monthlyLivretARates = LivretASelectedEntries.map(entry => entry[1]);
+
+  // Table de rendements du module Actions mensualisés
+  const ActionsStartIndex = findStartIndex(MonthlyActionsReturns, TARGET_START_DATE);
+  const ActionsEndIndex = ActionsStartIndex + NUMBER_OF_ENTRIES;
+  const ActionsSelectedEntries = MonthlyActionsReturns.slice(ActionsStartIndex, ActionsEndIndex);
+  const monthlyActionsRates = ActionsSelectedEntries.map(entry => entry[1]);
+
+// Références aux éléments du DOM pour Dashboard
+const currentYearEl = document.getElementById('current-year');
+const availableMoneyEl = document.getElementById('available-money');
+const totalWealthEl = document.getElementById('total-wealth');
+
+// Références aux éléments du DOM pour Actifs Alternatifs
+const actifsInvestedAmountsEl = document.getElementById('actifs-investedAmounts');
+const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
+
+// Références aux éléments du DOM pour Overlay
+const overlay = document.getElementById('overlay');
+const continueButton = document.getElementById('continue-button');
+
+// Instances des modules d'investissement
+const livretAModule = new InvestmentModule('livretA');
+const actionsModule = new InvestmentModule('actions');
+const obligationsModule = new InvestmentModule('obligations', {
+  customInvestHandler: handleObligationsInvest,
+  customWithdrawHandler: handleObligationsWithdraw
+}); 
+const residenceModule = new InvestmentModule('residencePrincipale', {
+  customInvestHandler: handleResidenceInvest,
+  customWithdrawHandler: handleResidenceSell
+});
+const actifsAlternatifsModule = new InvestmentModule('actifsAlternatifs');
+
+// Fonctions spécifiques du module Obligations
+function handleObligationsInvest() {
+  const investmentAmount = 100;
+
+  if (availableMoney >= investmentAmount) {
+    availableMoney -= investmentAmount;
+    obligations += investmentAmount;
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Pas assez d'argent disponible pour investir !");
+  }
+}
+
+function handleObligationsWithdraw() {
+  const withdrawalAmount = 100;
+
+  if (obligations >= withdrawalAmount) {
+    obligations -= withdrawalAmount;
+    availableMoney += withdrawalAmount;
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Pas assez d'argent sur les Obligations pour retirer !");
+  }
+}
+
+// Fonctions spécifiques du module Résidence Principale
+function handleResidenceInvest() {
+  if (availableMoney >= residenceArgentNecessaire) {
+    availableMoney -= residenceArgentNecessaire;
+    residenceInvestedAmount += residenceArgentNecessaire;
+    residenceProfit = 0;
+    residenceInvested = true; // Marquer comme investi
+    residenceModule.element.querySelector('.residence-state.state-1').classList.add('hidden');
+    residenceModule.element.querySelector('.residence-state.state-2').classList.remove('hidden');
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Pas assez d'argent disponible pour investir dans la Résidence Principale !");
+  }
+}
+
+function handleResidenceSell() {
+  if (residenceInvested) {
+    const sellAmount = residenceInvestedAmount;           // inclus déjà le Profit
+    availableMoney += sellAmount;
+    residenceInvestedAmount = 0;
+    residenceProfit = 0;
+    residenceInvested = false;
+    residenceModule.element.querySelector('.residence-state.state-1').classList.remove('hidden');
+    residenceModule.element.querySelector('.residence-state.state-2').classList.add('hidden');
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Aucune Résidence Principale à vendre !");
+  }
+}
+
 /**
- * Calcule le rendement mensuel d'un investissement.
- * @param {number} balance - Le solde actuel de l'investissement.
- * @param {number} rate - Le taux de rendement mensuel (ex. 0.005 pour 0,5%).
- * @param {number} profit - Le profit cumulé jusqu'à présent.
- * @returns {Object} - Un objet contenant le nouveau solde et le nouveau profit cumulé.
+ * Ajoute une ligne d'investissement dans l'interface utilisateur pour Actifs Alternatifs.
+ * @param {Object} investment - Objet d'investissement
  */
-function applyMonthlyReturn(balance, rate, profit) {
-  const interestEarned = balance * rate;
-  const newBalance = balance + interestEarned;
-  const newProfit = profit + interestEarned;
-  return { newBalance, newProfit };
+function addActifsInvestmentToUI(investment) {
+  const li = document.createElement('li');
+  li.id = `actifs-investment-${investment.id}`;
+  li.innerHTML = `
+    <span>Investissement de ${investment.amount.toLocaleString('fr-FR')} € pour ${investment.duration} ans</span>
+    <span>Profit : ${investment.profit.toLocaleString('fr-FR')} €</span>
+  `;
+  actifsInvestedAmountsEl.appendChild(li);
+}
+
+/**
+ * Calcule et met à jour le total des profits dans l'UI pour Actifs Alternatifs.
+ */
+function calculateActifsTotalProfit() {
+  const totalProfit = actifsAlternatifsInvestments.reduce((acc, investment) => acc + investment.profit, 0);
+  actifsTotalProfitEl.textContent = `${totalProfit.toLocaleString('fr-FR')} €`;
+}
+
+/**
+ * Met à jour les profits cumulés pour Actifs Alternatifs.
+ */
+function updateActifsProfits() {
+  actifsAlternatifsTotalProfit = 0;
+  actifsAlternatifsInvestments.forEach(investment => {
+    // Calculer le nombre de mois écoulés
+    const monthsElapsed = currentMonthIndex - investment.startMonth;
+
+    // Vérifier si la durée est atteinte
+    if (monthsElapsed >= investment.duration * 12) {
+      // Ajouter le profit et retirer l'investissement
+      availableMoney += investment.amount + investment.profit;
+      // Supprimer l'investissement du tableau
+      actifsAlternatifsInvestments = actifsAlternatifsInvestments.filter(inv => inv.id !== investment.id);
+      // Supprimer la ligne de l'UI
+      const li = document.getElementById(`actifs-investment-${investment.id}`);
+      if (li) li.remove();
+    } else {
+      // Appliquer un rendement mensuel (exemple: 0.5%)
+      const monthlyRate = 0.005;
+      const interestEarned = investment.amount * monthlyRate;
+      investment.profit += interestEarned;
+      actifsAlternatifsTotalProfit += interestEarned;
+
+      // Mettre à jour l'UI pour cette ligne
+      const li = document.getElementById(`actifs-investment-${investment.id}`);
+      if (li) {
+        li.querySelector('span:nth-child(2)').textContent = `Profit : ${investment.profit.toLocaleString('fr-FR')} €`;
+      }
+    }
+  });
+
+  // Mettre à jour le total des profits
+  calculateActifsTotalProfit();
+
+  // Sauvegarder les investissements mis à jour
+  saveData();
+}
+
+/**
+ * Met à jour l'interface utilisateur avec les nouvelles valeurs.
+ */
+function updateUI() {
+  const age = initialAge + currentYearIndex - 1;
+
+  // MAJ Dashboard
+  currentYearEl.innerHTML = `
+    <span class="dashboard-title">Année</span>
+    <span class="dashboard-amount">${currentYearIndex}</span> 
+    <span class="dashboard-title">sur</span> 
+    <span class="dashboard-amount">${totalYears}</span>
+  `;
+  availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
+  const totalWealth = availableMoney + livretA + obligations + actions;
+  totalWealthEl.textContent = `€${totalWealth.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
+
+  // MAJ module Livret A
+  livretAModule.amountEl.textContent = `€${livretA.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  livretAModule.profitEl.textContent = `€${livretAProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
+  livretAModule.investButton.disabled = livretA >= MAX_LIVRET_A;
+  livretAModule.withdrawButton.style.display = (livretA < 0.01) ? 'none' : 'inline-block';
+
+  // MAJ module Obligations
+  obligationsModule.amountEl.textContent = `€${obligations.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  obligationsModule.withdrawButton.style.display = (obligations < 100) ? 'none' : 'inline-block';
+
+  // MAJ module Actions
+  actionsModule.amountEl.textContent = `€${actions.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  actionsModule.profitEl.textContent = `€${actionsProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} de profit`;
+  actionsModule.withdrawButton.style.display = (actions < 100) ? 'none' : 'inline-block';
+
+  // MAJ module Résidence Principale
+  residenceModule.element.querySelector('#residence-age').textContent = age;
+  residenceModule.element.querySelector('#residence-taille').textContent = residenceSurfaceCible;
+
+  if (residenceInvested) {
+    residenceModule.element.querySelector('#residence-investedAmount').textContent = `${residenceInvestedAmount.toLocaleString('fr-FR')} € investis`;
+    residenceModule.element.querySelector('#residence-profit').textContent = `${residenceProfit.toLocaleString('fr-FR')} € de profit`;
+  }
+
+  // MAJ module Actifs Alternatifs
+  actifsAlternatifsModule.investButton.disabled = actifsAlternatifsInvestments.length >= MAX_ACTIFS_INVESTMENTS;
+  actifsAlternatifsModule.investButton.disabled = availableMoney < ACTIVITE_ALTERNATIF_MIN_INVEST;
+}
+
+/**
+ * Sauvegarde toutes les données dans le localStorage.
+ */
+function saveData() {
+  try {
+    // Sauvegarde des investissements dans Actifs Alternatifs
+    localStorage.setItem('actifsAlternatifsInvestments', JSON.stringify(actifsAlternatifsInvestments));
+
+    // Sauvegarde des autres modules si nécessaire
+    localStorage.setItem('livretA', livretA);
+    localStorage.setItem('livretAProfit', livretAProfit);
+    localStorage.setItem('obligations', obligations);
+    localStorage.setItem('obligationsProfit', obligationsProfit);
+    localStorage.setItem('actions', actions);
+    localStorage.setItem('actionsProfit', actionsProfit);
+    localStorage.setItem('residenceInvested', residenceInvested);
+    localStorage.setItem('residenceInvestedAmount', residenceInvestedAmount);
+    localStorage.setItem('residenceProfit', residenceProfit);
+  } catch (error) {
+    console.error('Erreur lors de la sauvegarde des données:', error);
+  }
+}
+
+/**
+ * Charge toutes les données depuis le localStorage.
+ */
+function loadData() {
+  try {
+    // Chargement des investissements dans Actifs Alternatifs
+    const actifsData = localStorage.getItem('actifsAlternatifsInvestments');
+    if (actifsData) {
+      actifsAlternatifsInvestments = JSON.parse(actifsData);
+      actifsAlternatifsInvestments.forEach(investment => {
+        addActifsInvestmentToUI(investment);
+      });
+      calculateActifsTotalProfit();
+    }
+
+    // Chargement des autres modules
+    const loadedLivretA = parseFloat(localStorage.getItem('livretA'));
+    const loadedLivretAProfit = parseFloat(localStorage.getItem('livretAProfit'));
+    if (!isNaN(loadedLivretA)) livretA = loadedLivretA;
+    if (!isNaN(loadedLivretAProfit)) livretAProfit = loadedLivretAProfit;
+
+    const loadedObligations = parseFloat(localStorage.getItem('obligations'));
+    const loadedObligationsProfit = parseFloat(localStorage.getItem('obligationsProfit'));
+    if (!isNaN(loadedObligations)) obligations = loadedObligations;
+    if (!isNaN(loadedObligationsProfit)) obligationsProfit = loadedObligationsProfit;
+
+    const loadedActions = parseFloat(localStorage.getItem('actions'));
+    const loadedActionsProfit = parseFloat(localStorage.getItem('actionsProfit'));
+    if (!isNaN(loadedActions)) actions = loadedActions;
+    if (!isNaN(loadedActionsProfit)) actionsProfit = loadedActionsProfit;
+
+    const loadedResidenceInvested = localStorage.getItem('residenceInvested') === 'true';
+    const loadedResidenceInvestedAmount = parseFloat(localStorage.getItem('residenceInvestedAmount'));
+    const loadedResidenceProfit = parseFloat(localStorage.getItem('residenceProfit'));
+    residenceInvested = loadedResidenceInvested;
+    residenceInvestedAmount = !isNaN(loadedResidenceInvestedAmount) ? loadedResidenceInvestedAmount : 0;
+    residenceProfit = !isNaN(loadedResidenceProfit) ? loadedResidenceProfit : 0;
+
+    // Mise à jour de l'interface utilisateur après chargement
+    updateUI();
+
+    // Mise à jour des états des modules Résidence Principale
+    if (residenceInvested) {
+      residenceModule.element.querySelector('.residence-state.state-1').classList.add('hidden');
+      residenceModule.element.querySelector('.residence-state.state-2').classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des données:', error);
+  }
 }
 
 /**
@@ -587,9 +676,9 @@ function startGame() {
       return;
     }
 
-    currentYearIndex = Math.floor(currentMonthIndex / 12) + 1; 
+    currentYearIndex = Math.floor(currentMonthIndex / 12) + 1;
 
-    availableMoney += 100; 
+    availableMoney += 100;
 
     // Appliquer les rendements mensuels pour Livret A
     const livretAMonthlyRate = monthlyLivretARates[currentMonthIndex];
@@ -645,10 +734,10 @@ function showOverlay() {
 /* Cache l'overlay et reprend le jeu, en affichant le module "Actions". */
 function hideOverlay() {
   overlay.classList.add('hidden');
-  
+
   // Afficher le module "Actions"
-  const actionsModule = document.getElementById('module-actions');
-  actionsModule.classList.remove('hidden');
+  const actionsModuleElement = document.querySelector('.module[data-module="actions"]');
+  actionsModuleElement.classList.remove('hidden');
 
   updateUI();
   resumeGame();
@@ -659,8 +748,20 @@ continueButton.addEventListener('click', () => {
   hideOverlay();
 });
 
-// Mise à jour initiale de l'interface utilisateur
-updateUI();
+// Fonction de calcul du rendement mensuel.
+function applyMonthlyReturn(balance, rate, profit) {
+  const interestEarned = balance * rate;
+  const newBalance = balance + interestEarned;
+  const newProfit = profit + interestEarned;
+  return { newBalance, newProfit };
+}
 
-// Démarrer le jeu au chargement de la page
-startGame();
+// Fonction pour initialiser l'application
+function init() {
+  loadData();
+  updateUI();
+  startGame();
+}
+
+// Appel de l'initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', init);
