@@ -36,7 +36,7 @@ class InvestmentModule {
     // Gestionnaire pour les boutons Investir (livret A, Actions)
     if (this.investButton) {
       if (this.customInvestHandler) {
-        this.investButton.addEventListener('click', this.customInvestHandler);          // Pour le module obligations
+        this.investButton.addEventListener('click', this.customInvestHandler);          // Pour les modules obligations et Fonds immobiliers pour l'instant
       } else {
         this.investButton.addEventListener('click', () => this.openActionForm('invest'));
       }
@@ -45,7 +45,7 @@ class InvestmentModule {
     // Gestionnaire pour Retirer (livret A, Actions)
     if (this.withdrawButton) {
       if (this.customWithdrawHandler) {
-        this.withdrawButton.addEventListener('click', this.customWithdrawHandler);      // Pour le module obligations
+        this.withdrawButton.addEventListener('click', this.customWithdrawHandler);      // Pour le module obligations et Fonds immobiliers pour l'instant
       } else {
         this.withdrawButton.addEventListener('click', () => this.openActionForm('withdraw'));
       }
@@ -125,6 +125,15 @@ class InvestmentModule {
           button.setAttribute('aria-pressed', 'false');
         }
       });
+    }
+
+    // Gestion spécifique pour Fonds Immobiliers
+    if (this.moduleName === 'fondsImmobiliers') {
+      console.log("Fonds Immobiliers : Passage à l'état 2 (formulaire affiché)");1
+      this.element.querySelector('.fondsImmobiliers-state-1')?.classList.add('hidden');
+      this.element.querySelector('.fondsImmobiliers-state-2')?.classList.remove('hidden');
+
+      // Vous pouvez ajouter des sélections spécifiques si nécessaire
     }
   }
 
@@ -358,6 +367,9 @@ let residenceProfit = 0;
 const residenceSurfaceCible = 50;         // Surface en m² par défaut (à rendre dynamique)
 const residenceArgentNecessaire = 10000;  // Argent en € par défaut (à rendre dynamique)
 
+let fondsImmobiliers = 0;
+let fondsImmobiliersProfit = 0;
+
 let actifsAlternatifsInvestments = [];    // Tableau pour stocker les investissements
 let actifsAlternatifsTotalProfit = 0;
 const MAX_ACTIFS_INVESTMENTS = 3;
@@ -415,6 +427,10 @@ const residenceModule = new InvestmentModule('residencePrincipale', {
   customInvestHandler: handleResidenceInvest,
   customWithdrawHandler: handleResidenceSell
 });
+const fondsImmobiliersModule = new InvestmentModule('fondsImmobiliers', {
+  customInvestHandler: handleFondsImmobiliersInvest,
+  customWithdrawHandler: handleFondsImmobiliersWithdraw
+}); 
 const actifsAlternatifsModule = new InvestmentModule('actifsAlternatifs');
 
 // Fonctions spécifiques du module Obligations
@@ -479,6 +495,37 @@ function handleResidenceSell() {
     alert("Aucune Résidence Principale à vendre !");
   }
 }
+
+// Fonctions spécifiques du module Fonds Immobiliers
+function handleFondsImmobiliersInvest() {
+  const investmentAmount = 100;
+
+  if (availableMoney >= investmentAmount) {
+    availableMoney -= investmentAmount;
+    fondsImmobiliers += investmentAmount;
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Pas assez d'argent disponible pour investir !");
+  }
+}
+
+function handleFondsImmobiliersWithdraw() {
+  const withdrawalAmount = 100;
+
+  if (fondsImmobiliers >= withdrawalAmount) {
+    fondsImmobiliers -= withdrawalAmount;
+    availableMoney += withdrawalAmount;
+
+    saveData();
+    updateUI();
+  } else {
+    alert("Pas assez d'argent sur les Fonds Immobiliers pour retirer !");
+  }
+}
+
+// Fonctions spécifiques du module Acrifs Alternatifs
 
 /**
  * Ajoute une ligne d'investissement dans l'interface utilisateur pour Actifs Alternatifs.
@@ -556,7 +603,7 @@ function updateUI() {
     <span class="dashboard-amount">${totalYears}</span>
   `;
   availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
-  const totalWealth = availableMoney + livretA + obligations + actions;
+  const totalWealth = availableMoney + livretA + obligations + actions + residenceInvestedAmount + fondsImmobiliers;
   totalWealthEl.textContent = `€${totalWealth.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
 
   // MAJ module Livret A
@@ -583,6 +630,10 @@ function updateUI() {
     residenceModule.element.querySelector('#residence-profit').textContent = `${residenceProfit.toLocaleString('fr-FR')} € de profit`;
   }
 
+  // MAJ module Fonds Immobiliers
+  fondsImmobiliersModule.amountEl.textContent = `€${fondsImmobiliers.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")} investis`;
+  fondsImmobiliersModule.withdrawButton.style.display = (fondsImmobiliers < 100) ? 'none' : 'inline-block';  
+
   // MAJ module Actifs Alternatifs
   actifsAlternatifsModule.investButton.disabled = actifsAlternatifsInvestments.length >= MAX_ACTIFS_INVESTMENTS;
   actifsAlternatifsModule.investButton.disabled = availableMoney < ACTIVITE_ALTERNATIF_MIN_INVEST;
@@ -606,6 +657,8 @@ function saveData() {
     localStorage.setItem('residenceInvested', residenceInvested);
     localStorage.setItem('residenceInvestedAmount', residenceInvestedAmount);
     localStorage.setItem('residenceProfit', residenceProfit);
+    localStorage.setItem('fondsImmobiliers', fondsImmobiliers);
+    localStorage.setItem('fondsImmobiliersProfit', fondsImmobiliersProfit);
   } catch (error) {
     console.error('Erreur lors de la sauvegarde des données:', error);
   }
@@ -648,6 +701,11 @@ function loadData() {
     residenceInvested = loadedResidenceInvested;
     residenceInvestedAmount = !isNaN(loadedResidenceInvestedAmount) ? loadedResidenceInvestedAmount : 0;
     residenceProfit = !isNaN(loadedResidenceProfit) ? loadedResidenceProfit : 0;
+
+    const loadedFondsImmobiliers = parseFloat(localStorage.getItem('fondsImmobiliers'));
+    const loadedFondsImmobiliersProfit = parseFloat(localStorage.getItem('fondsImmobiliersProfit'));
+    if (!isNaN(loadedFondsImmobiliers)) fondsImmobiliers = loadedFondsImmobiliers;
+    if (!isNaN(loadedFondsImmobiliersProfit)) fondsImmobiliersProfit = loadedFondsImmobiliersProfit;
 
     // Mise à jour de l'interface utilisateur après chargement
     updateUI();
