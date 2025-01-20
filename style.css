@@ -21,49 +21,49 @@
   --dashboard-bg-color: var(--primary-lavander-dark);
   --modules-container-bg-color: var(--primary-bittersweet-light);
   --module-bg-color: var(--neutral-white);
-  --overlay-content-bg: var(--form-background);
+  --module-shadow-color: 0 0 5px rgba(0,0,0,0.1);
+
+  /* Couleurs de Bordure */
+  --module-border-color: var(--primary-lavander-dark);
+  --module-inner-border-color: var(--primary-lavander-light);
 
   /* Couleurs de Texte */
   --text-color: var(--neutral-dark);
   --text-dashboard: var(--neutral-light);
   --dashboard-amount: var(--neutral-light);
 
-  /* Couleurs de Bordure */
-  --module-border-color: var(--primary-lavander-dark);
-  --module-inner-border-color: var(--primary-lavander-light);
-
-  /* Boutons */
-  --button-bg-color: var(--primary-lavander-light);
-  --button-hover-bg-color: var(--primary-lavander-dark);
+  /* Boutons génériques*/
   --button-text-color: var(--neutral-white);
-
   --action-button-bg-color: var(--primary-lavander-light);
   --action-button-hover-bg-color: var(--primary-lavander-dark);
   --action-button-disabled-bg-color: var(--neutral-light);
 
-  --active-button-bg-color: var(--primary-lavander-light);
-  --inactive-button-bg-color: var(--neutral-dark);
-
-  --highlight-color: #FFC107;
-
-  /* Icones de Fermeture */
-  --close-icon: var(--primary-lavander-dark);
-  --close-icon-hover: var(--primary-bittersweet-dark);
-
-  /* Boutons MAX */
-  --max-button-bg-color:  #e0e0e0;
-  --max-button-border-color: var(--max-button-bg-color);
-  --max-button-hover-bg-color: var(--neutral-light);
-  --max-button-text-color: var(--neutral-dark);
-  --max-button-hover-text-color: var(--primary-bittersweet-dark);
-
-  /* Formulaires d'Action */
+  /* Formulaires de validation de montant à investir ou retirer */
   --action-form-bg-color: var(--form-background);
   --form-background: var(--neutral-light);
-  --form-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --form-shadow: 0 0 10px rgba(0,0,0,0.1);
 
-  /* Overlay */
+    --close-icon: var(--primary-lavander-dark);
+    --close-icon-hover: var(--primary-bittersweet-dark);
+
+    --max-button-bg-color:  #e0e0e0;
+    --max-button-border-color: var(--max-button-bg-color);
+    --max-button-hover-bg-color: var(--neutral-light);
+    --max-button-text-color: var(--neutral-dark);
+    --max-button-hover-text-color: var(--primary-bittersweet-dark);
+
+  /* Boutons ronds de durée*/
+  --active-button-bg-color: var(--primary-lavander-light);
+  --inactive-button-bg-color: var(--neutral-dark);
+  
+  /* Overlays */
   --overlay-bg-color: rgba(0, 0, 0, 0.7);
+  --overlay-container-bg-color: var(--neutral-dark);
+  --overlay-content-bg-color: var(--neutral-dark);
+  --overlay-content-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --overlay-text-color: var(--neutral-light);
+  --overlay-nav-color: var(--neutral-light);
+  --overlay-hover-nav-color: var(--neutral-white);
 
   /* Transition */
   --transition-speed: 0.3s;
@@ -153,7 +153,7 @@ body {
   background: var(--module-bg-color);
   color: var(--text-color);
   padding: 20px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: var(--module-shadow-color);
   border-radius: 5px;           /* Bords arrondis */
   flex: 1;
 }
@@ -297,7 +297,7 @@ body {
   border: 2px solid var(--module-border-color);
   border-radius: 6px;
   position: relative;             /* For positioning the close icon */
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: var(--form-shadow);
 }
 
 .action-form.show {
@@ -361,53 +361,162 @@ body {
   border: none;
   cursor: pointer;
   font-size: 1em;
-  background-color: var(--button-bg-color);
+  background-color: var(--action-button-bg-color);
   color: var(--button-text-color);
   transition: background-color 0.3s ease;
 }
 
 .confirm-button:hover {
-  background-color: var(--button-hover-bg-color);
+  background-color: var(--action-button-hover-bg-color);
 }
 
 /* Affichage des Overlay de transition*/
-#overlay {
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--overlay-bg-color);  /* Fond semi-transparent */
+  background-color: var(--overlay-bg-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;                              /* Au-dessus des autres éléments */
+  z-index: 2000;                       /* Au-dessus de tout (assurez-vous que c'est plus élevé que modules-container) */
+  transition: opacity var(--transition-speed), visibility var(--transition-speed);
+  opacity: 0;
+  visibility: hidden;
 }
 
-.overlay-content {
-  background-color: var(--overlay-content-bg);
-  padding: 30px;
-  border-radius: 8px;
-  text-align: center;
-  max-width: 400px;
-  width: 80%;
+.overlay.show {
+  opacity: 1;
+  visibility: visible;
 }
 
-.overlay-continue-button {
-  padding: 10px 20px;
-  font-size: 1em;
-  cursor: pointer;
-  background-color: var(--action-button-bg-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top: 20px;
-  transition: background-color 0.3s ease;
-}
+  /* Conteneur de l'overlay en superposition des modules d'investissement */
+  .overlay-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100% - 250px);
+    height: 100%;
+    background-color: var(--overlay-container-bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-.overlay-continue-button:hover {
-  background-color: var(--action-button-hover-bg-color);
-}
+  /* Contenu de l'Overlay */
+  .overlay-content {
+    background-color: var(--overlay-content-bg-color);
+    padding: 30px 40px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: var(--overlay-content-shadow);
+    text-align: center;
+    position: relative;
+    z-index: 2100;                       /* Au-dessus de l'overlay background */
+  }
+
+  /* Titres et Descriptions */
+  .overlay-content h3 {
+    margin-bottom: 15px;
+    color: var(--overlay-text-color);
+    font-size: 1.5em;
+  }
+
+  .overlay-content p {
+    margin-bottom: 20px;
+    color: var(--overlay-text-color);
+    font-size: 1.1em;
+  }
+
+  /* Styles pour les messages */
+  .overlay-message {
+    display: none;
+  }
+
+  .overlay-message.active {
+    display: block;
+  }
+
+  /* Flèches de Navigation */
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    color: var(--overlay-nav-color);
+    transition: color var(--transition-speed);
+  }
+
+  .nav-button:hover {
+    color: var(--overlay-hover-nav-color);
+  }
+
+  /* Position des Flèches */
+  .prev-button {
+    left: 0px;
+  }
+
+  .next-button {
+    right: 0px;
+  }
+
+  /* Bouton "J'ai compris" */
+  .overlay-continue-button {
+    padding: 10px 20px;
+    background-color: var(--primary-bittersweet-light);
+    color: var(--neutral-white);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color var(--transition-speed);
+    margin-top: 20px;
+  }
+
+  .overlay-continue-button:hover {
+    background-color: var(--primary-bittersweet-dark);
+  }
+
+  /* Dashboard avec filtre lorsque l'overlay est actif */
+  .dashboard.overlay-active {
+    position: relative;
+  }
+
+  .dashboard.overlay-active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(96, 96, 96, 0.5); /* Couleur de filtre ajustée pour une meilleure visibilité */
+    z-index: -1;                       /* Sous l'overlay */
+    border-radius: 10px;
+  }
+
+  /* Assurez-vous que .modules-container n'a pas un z-index plus élevé que les overlays */
+  .modules-container {
+    position: relative;
+    z-index: 1000;                       /* Par défaut, inférieur aux overlays */
+  }
+
+  /* Optionnel : Animation pour une entrée plus fluide */
+  .overlay-content {
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform var(--transition-speed), opacity var(--transition-speed);
+  }
+
+  .overlay.show .overlay-content {
+    transform: scale(1);
+    opacity: 1;
+  }
 
 /* Responsive adjustments */
 @media (max-width: 800px) {

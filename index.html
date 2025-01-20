@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
 </head>
+
 <body>
 
   <div class="container">
@@ -181,12 +183,55 @@
 
   </div>
 
-  <!-- Overlay pour les transitions -->
-  <div id="overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
-    <div class="overlay-content">
-      <h2 id="overlay-title">Bienvenue dans la Deuxième Année !</h2>
-      <p>Vous avez maintenant accès aux Actions.</p>
-      <button id="continue-button" class="overlay-continue-button">Continuer</button>
+  <!-- Overlays -->
+  <!-- Overlay pour le Module Obligations -->
+  <div id="overlay-obligations" class="overlay hidden">
+    <div class="overlay-container">
+      <div class="overlay-content">
+        <div class="overlay-message active">
+          <h3>Découverte des Obligations</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
+        </div>
+        <div class="overlay-message">
+          <h3>Avantages des Obligations</h3>
+          <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
+        </div>
+        <div class="overlay-message">
+          <h3>Comment Investir</h3>
+          <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
+        </div>
+        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+        <button class="overlay-continue-button hidden">J'ai compris</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay pour le Module Actions -->
+  <div id="overlay-actions" class="overlay hidden">
+    <div class="overlay-container">
+      <div class="overlay-content">
+        <!-- Messages -->
+        <div class="overlay-message active">
+          <h3>Découverte des Actions</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
+        </div>
+        <div class="overlay-message">
+          <h3>Avantages des Actions</h3>
+          <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
+        </div>
+        <div class="overlay-message">
+          <h3>Risques des Actions</h3>
+          <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
+        </div>
+
+        <!-- Flèches de Navigation -->
+        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+
+        <!-- Bouton "J'ai compris" -->
+        <button class="overlay-continue-button hidden">J'ai compris</button>
+      </div>
     </div>
   </div>
 

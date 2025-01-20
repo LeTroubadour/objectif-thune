@@ -27,6 +27,9 @@ class InvestmentModule {
     // Options pour comportements spécifiques
     this.customInvestHandler = options.customInvestHandler || null;
     this.customWithdrawHandler = options.customWithdrawHandler || null;
+
+    // Propriété pour gérer l'activation d'un overlay
+    this.activated = false;
     
     // Initialisation spécifique selon le module
     this.init();
@@ -375,6 +378,9 @@ let actifsAlternatifsTotalProfit = 0;
 const MAX_ACTIFS_INVESTMENTS = 3;
 const ACTIVITE_ALTERNATIF_MIN_INVEST = 10000;
 
+// Variable pour la gestion des overlays
+let isOverlayActive = false;
+
 // Tables de rendements mensuels
 const randomYear = Math.floor(Math.random() * (2004 - 1980 + 1)) + 1980;
 const randomMonth = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
@@ -412,9 +418,9 @@ const totalWealthEl = document.getElementById('total-wealth');
 const actifsInvestedAmountsEl = document.getElementById('actifs-investedAmounts');
 const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
 
-// Références aux éléments du DOM pour Overlay
-const overlay = document.getElementById('overlay');
-const continueButton = document.getElementById('continue-button');
+// Références aux éléments du DOM pour Overlays
+const overlayObligations = document.getElementById('overlay-obligations');
+const overlayActions = document.getElementById('overlay-actions');
 
 // Instances des modules d'investissement
 const livretAModule = new InvestmentModule('livretA');
@@ -764,14 +770,13 @@ function startGame() {
       updateActifsProfits();
     }
 
+    // Mettre à jour l'interface utilisateur
     updateUI();
 
-    // **Détecter le début de la deuxième année pour afficher l'overlay**
-    if (currentYearIndex === 2 && currentMonthIndex % 12 === 0) {
-      pauseGame();
-      showOverlay();
-    }
-  }, 5000); // Interval en ms qui représente un mois
+    // Vérifier et afficher les overlays si nécessaire
+    checkAndShowOverlays();
+
+  }, 500); // Interval en ms qui représente un mois
 }
 
 /* Met en pause le jeu en arrêtant l'intervalle. */
@@ -784,27 +789,121 @@ function resumeGame() {
   startGame();
 }
 
+// Fonction pour activer un module
+function activateModule(moduleName) {
+  const module = document.querySelector(`.module[data-module="${moduleName}"]`);
+  if (module) {
+    module.classList.remove('hidden');
+    console.log(`Module ${moduleName} activé.`);
+  } else {
+    console.warn(`Module ${moduleName} non trouvé.`);
+  }
+}
+
 /* Affiche l'overlay et bloque le jeu. */
-function showOverlay() {
-  overlay.classList.remove('hidden');
+function showOverlay(overlayElement) {
+  if (isOverlayActive) return; // Empêche l'ouverture de plusieurs overlays simultanément
+
+  isOverlayActive = true;
+  pauseGame();
+
+  // Appliquer le filtre au dashboard
+  const dashboard = document.querySelector('.dashboard');
+  dashboard.classList.add('overlay-active');
+
+  // Afficher l'overlay
+  overlayElement.classList.remove('hidden');
+  overlayElement.classList.add('show');
+
+  // Initialiser la navigation des overlays
+  initializeOverlayNavigation(overlayElement);
 }
 
 /* Cache l'overlay et reprend le jeu, en affichant le module "Actions". */
-function hideOverlay() {
-  overlay.classList.add('hidden');
+function hideOverlay(overlayElement) {
+  if (!isOverlayActive) return;
 
-  // Afficher le module "Actions"
-  const actionsModuleElement = document.querySelector('.module[data-module="actions"]');
-  actionsModuleElement.classList.remove('hidden');
+  // Masquer l'overlay
+  overlayElement.classList.remove('show');
 
-  updateUI();
+  // Enlever le filtre du dashboard
+  const dashboard = document.querySelector('.dashboard');
+  dashboard.classList.remove('overlay-active');
+
+  isOverlayActive = false;
   resumeGame();
 }
 
-// Ajouter un gestionnaire d'événement pour le bouton "Continuer" de l'overlay
-continueButton.addEventListener('click', () => {
-  hideOverlay();
-});
+// Fonction pour initialiser la navigation des overlays
+function initializeOverlayNavigation(overlayElement) {
+  const messages = overlayElement.querySelectorAll('.overlay-message');
+  const prevButton = overlayElement.querySelector('.prev-button');
+  const nextButton = overlayElement.querySelector('.next-button');
+  const continueButton = overlayElement.querySelector('.overlay-continue-button');
+  let currentMessageIndex = 0;
+
+  // Fonction pour afficher le message courant
+  function showMessage(index) {
+    messages.forEach((msg, idx) => {
+      msg.classList.toggle('active', idx === index);
+    });
+
+    // Gérer l'affichage des flèches
+    prevButton.style.display = index === 0 ? 'none' : 'block';
+    nextButton.style.display = index === messages.length - 1 ? 'none' : 'block';
+
+    // Afficher le bouton "J'ai compris" uniquement sur le dernier message
+    if (index === messages.length - 1) {
+      continueButton.classList.remove('hidden');
+    } else {
+      continueButton.classList.add('hidden');
+    }
+  }
+
+  // Initialiser l'affichage
+  showMessage(currentMessageIndex);
+
+  // Gestionnaire pour le bouton Précédent
+  prevButton.onclick = () => {
+    if (currentMessageIndex > 0) {
+      currentMessageIndex--;
+      showMessage(currentMessageIndex);
+    }
+  };
+
+  // Gestionnaire pour le bouton Suivant
+  nextButton.onclick = () => {
+    if (currentMessageIndex < messages.length - 1) {
+      currentMessageIndex++;
+      showMessage(currentMessageIndex);
+    }
+  };
+
+  // Gestionnaire pour le bouton "J'ai compris"
+  continueButton.onclick = () => {
+    hideOverlay(overlayElement);
+
+    // Activer le module correspondant après la fermeture de l'overlay
+    if (overlayElement.id === 'overlay-obligations') {
+      activateModule('obligations');
+    } else if (overlayElement.id === 'overlay-actions') {
+      activateModule('actions');
+    }
+  };
+}
+
+// Fonction pour vérifier et afficher les overlays en fonction de l'année écoulée
+function checkAndShowOverlays() {
+  if (currentYearIndex === 2 && currentMonthIndex % 12 === 0 && !obligationsModule.activated) {
+    showOverlay(overlayObligations);
+    obligationsModule.activated = true;
+  }
+
+  if (currentYearIndex === 3 && currentMonthIndex % 12 === 0 && !actionsModule.activated) {
+    showOverlay(overlayActions);
+    actionsModule.activated = true;
+  }
+}
 
 // Fonction de calcul du rendement mensuel.
 function applyMonthlyReturn(balance, rate, profit) {
