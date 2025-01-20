@@ -1,43 +1,77 @@
+/* Importation de la police "Poppins" */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 /* Variables pour une gestion centralisée des couleurs */
 :root {
-  --background-color: #f0f0f0;
-  --text-color: #333;
+  /* Neutres */
+  --neutral-white: #FFFFFF;
+  --neutral-dark: #616161;
+  --neutral-light: #F0F0F0;
 
-  --dashboard-bg-color: #FFDAB9;
-  --dashboard-amount:#000;
+  /* Couleurs Primaires */
+  --primary-lavander-dark: #967ADC;
+  --primary-lavander-light: #AC92EC;
+  --primary-bittersweet-dark: #E9573F;
+  --primary-bittersweet-light: #FC6E51;
 
-  --modules-container-bg-color: #777574;
-  --module-bg-color: #eeebed;
-  --module-border-color: #000;
-  --module-inner-border-color: rgb(2, 2, 2);
+  /* Couleurs Secondaires TBD*/
 
-  --button-bg-color: #2ecc71;
-  --button-hover-bg-color: #105c2f;
-  --button-text-color: #fff;
+  /* Couleurs de Fond */
+  --background-color: var(--neutral-light);
+  --dashboard-bg-color: var(--primary-lavander-dark);
+  --modules-container-bg-color: var(--primary-bittersweet-light);
+  --module-bg-color: var(--neutral-white);
+  --overlay-content-bg: var(--form-background);
 
-  --action-form-bg-color:#f9f9f9;
-  --action-button-bg-color: #2ecc71;
-  --action-button-hover-bg-color: #105c2f;
-  --action-button-disabled-bg-color:#95a5a6;
+  /* Couleurs de Texte */
+  --text-color: var(--neutral-dark);
+  --text-dashboard: var(--neutral-light);
+  --dashboard-amount: var(--neutral-light);
 
-  --active-button-bg-color: rgb(36, 35, 35);
-  --inactive-button-bg-color: rgb(87, 85, 85);
+  /* Couleurs de Bordure */
+  --module-border-color: var(--primary-lavander-dark);
+  --module-inner-border-color: var(--primary-lavander-light);
+
+  /* Boutons */
+  --button-bg-color: var(--primary-lavander-light);
+  --button-hover-bg-color: var(--primary-lavander-dark);
+  --button-text-color: var(--neutral-white);
+
+  --action-button-bg-color: var(--primary-lavander-light);
+  --action-button-hover-bg-color: var(--primary-lavander-dark);
+  --action-button-disabled-bg-color: var(--neutral-light);
+
+  --active-button-bg-color: var(--primary-lavander-light);
+  --inactive-button-bg-color: var(--neutral-dark);
+
   --highlight-color: #FFC107;
 
-  --close-icon: #420303;
-  --close-icon-hover: rgb(253, 3, 3);
+  /* Icones de Fermeture */
+  --close-icon: var(--primary-lavander-dark);
+  --close-icon-hover: var(--primary-bittersweet-dark);
 
-  --max-button-bg-color:#5a5e5b;
-  --max-button-hover-bg-color:##e0e0e0;
-  --max-button-border-color: #ccc;
-  --max-button-text-color: #fff;
-  --max-button-hover-text-color: #000;
+  /* Boutons MAX */
+  --max-button-bg-color:  #e0e0e0;
+  --max-button-border-color: var(--max-button-bg-color);
+  --max-button-hover-bg-color: var(--neutral-light);
+  --max-button-text-color: var(--neutral-dark);
+  --max-button-hover-text-color: var(--primary-bittersweet-dark);
 
+  /* Formulaires d'Action */
+  --action-form-bg-color: var(--form-background);
+  --form-background: var(--neutral-light);
+  --form-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  /* Overlay */
   --overlay-bg-color: rgba(0, 0, 0, 0.7);
-  --overlay-content-bg: #fff;
 
+  /* Transition */
+  --transition-speed: 0.3s;
+
+  /* Cacher les éléments */
   --hidden-display: none;
 }
+
 
 /* Paramètres de défaut */
 * {
@@ -47,7 +81,7 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: var(--background-color);
 }
 
@@ -81,6 +115,7 @@ body {
   font-weight: bold;
   color: var(--text-color);
   margin-bottom: 1px;
+  color: var(--text-dashboard);
 }
 
 .dashboard-amount {
@@ -167,7 +202,7 @@ body {
 }
 
 .module-amount {
-  font-size: 1.3em;
+  font-size: 1.2em;
   margin: 20px 0;
   display: none;
 }
@@ -241,6 +276,7 @@ body {
   cursor: pointer;
   margin-right: 10px;
   transition: background-color 0.3s ease;
+  font-size: 1em;
 }
 
 .action-button:hover {
@@ -255,15 +291,13 @@ body {
 /* Affichage composant de saisie manuelle de montant à investir ou retirer */
 .action-form {
   display: none;                  /* Hidden by default */
-  gap: 10px;                      /* Space between elements */
   width: 100%;                    /* Full width */
-  max-width: 420px;               /* Optional: Limits the width */
+  max-width: 282px;               /* Optional: Limits the width */
   background-color: var(--action-form-bg-color);
   border: 2px solid var(--module-border-color);
   border-radius: 6px;
   position: relative;             /* For positioning the close icon */
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  padding: 10px;
 }
 
 .action-form.show {
@@ -275,9 +309,10 @@ body {
 .close-icon {
   color: var(--close-icon);
   float: right;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
   cursor: pointer;
+  padding: 5px;
 }
 
 .close-icon:hover {
@@ -290,6 +325,7 @@ body {
   outline: none;             /* Removes the focus outline (use with caution) */
   text-align: right;
   background: transparent;
+  max-width: 100px; 
   padding: 8px;
   font-size: 1em;
 }
@@ -307,11 +343,9 @@ body {
 
 .max-button {
   padding: 8px 12px;
-  margin-left: 10px;
   background-color: var(--max-button-bg-color);
   color: var(--max-button-text-color);
   border: 1px solid var(--max-button-border-color);
-  border-radius: 4px;
   cursor: pointer;
   font-size: 0.9em;
   transition: background-color 0.3s ease;
