@@ -31,12 +31,17 @@
   --text-color: var(--neutral-dark);
   --text-dashboard: var(--neutral-light);
   --dashboard-amount: var(--neutral-light);
-
+  
   /* Boutons génériques*/
   --button-text-color: var(--neutral-white);
   --action-button-bg-color: var(--primary-lavander-light);
   --action-button-hover-bg-color: var(--primary-lavander-dark);
   --action-button-disabled-bg-color: var(--neutral-light);
+
+  /* Ecran d'introduction */
+  --intro-screen-bg-color: var(--primary-bittersweet-dark);
+  --intro-screen-text-color: var(--neutral-white);
+  --intro-screen-button-bg-color: var(--action-button-bg-color);
 
   /* Formulaires de validation de montant à investir ou retirer */
   --action-form-bg-color: var(--form-background);
@@ -68,8 +73,6 @@
   /* Transition */
   --transition-speed: 0.3s;
 
-  /* Cacher les éléments */
-  --hidden-display: none;
 }
 
 
@@ -86,7 +89,61 @@ body {
 }
 
 .hidden {
-  display: var(--hidden-display) !important;
+  display: none !important;
+}
+
+/* Styles pour l'Écran d'Introduction */
+.intro-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--intro-screen-bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000; /* Au-dessus des autres éléments */
+  transition: opacity var(--transition-speed), visibility var(--transition-speed);
+  opacity: 1;
+  visibility: visible;
+}
+
+.intro-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.intro-content {
+  text-align: center;
+  max-width: 600px; 
+}
+
+.intro-content h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: var(--intro-screen-text-color);
+}
+
+.intro-content p {
+  font-size: 1.1em;
+  margin-bottom: 30px;
+  color: var(--intro-screen-text-color);
+}
+
+.play-button {
+  padding: 15px 30px;
+  font-size: 1.1em;
+  background-color: var(--intro-screen-button-bg-color);
+  color: var(--intro-screen-text-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.play-button:hover {
+  background-color: var(--primary-lavander-dark);
 }
 
 /* Container dashboard et modules */
@@ -94,6 +151,10 @@ body {
   height: 100vh;                /* Hauteur totale de la fenêtre */
   overflow-y: auto;             /* Ajoute un défilement vertical si contenu dépasse */
   display: flex;
+}
+
+.container.hidden {
+  display: none;
 }
 
 /* Dashboard */

@@ -409,7 +409,12 @@ const NUMBER_OF_ENTRIES = totalYears * 12;
   const ActionsSelectedEntries = MonthlyActionsReturns.slice(ActionsStartIndex, ActionsEndIndex);
   const monthlyActionsRates = ActionsSelectedEntries.map(entry => entry[1]);
 
+// Références aux éléments du DOM pour l'écran d'introduction
+const introScreen = document.getElementById('intro-screen');
+const playButton = document.getElementById('play-button');
+
 // Références aux éléments du DOM pour Dashboard
+const gameContainer = document.getElementById('game-container');
 const currentYearEl = document.getElementById('current-year');
 const availableMoneyEl = document.getElementById('available-money');
 const totalWealthEl = document.getElementById('total-wealth');
@@ -438,6 +443,27 @@ const fondsImmobiliersModule = new InvestmentModule('fondsImmobiliers', {
   customWithdrawHandler: handleFondsImmobiliersWithdraw
 }); 
 const actifsAlternatifsModule = new InvestmentModule('actifsAlternatifs');
+
+// Fonctions spécifiques de l'écran d'introduction
+function showIntroScreen() {
+  introScreen.classList.remove('hidden');
+  gameContainer.classList.add('hidden');
+}
+
+function hideIntroScreen() {
+  introScreen.classList.add('hidden');
+  gameContainer.classList.remove('hidden');
+}
+
+function handlePlayButtonClick() {
+  hideIntroScreen();
+  init();
+}
+
+function initIntro() {
+  showIntroScreen();
+  playButton.addEventListener('click', handlePlayButtonClick);
+}
 
 // Fonctions spécifiques du module Obligations
 function handleObligationsInvest() {
@@ -921,4 +947,4 @@ function init() {
 }
 
 // Appel de l'initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', initIntro);
