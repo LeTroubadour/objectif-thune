@@ -88,8 +88,21 @@ class InvestmentModule {
       });
     }
 
+    // Charger l'état d'activation depuis les données sauvegardées
+    this.activated = checkModuleActivation(this.moduleName);
+    if (this.activated) {
+      this.activate();
+    }
+
     // Chargement des données depuis localStorage
     this.loadData();
+  }
+
+  // Méthode pour activer un module
+  activate() {
+    this.activated = true;
+    this.element.classList.remove('hidden');
+    updateModulesLayout();
   }
 
   // Ouvre le formulaire d'action avec l'action spécifiée (invest, withdraw)
@@ -419,6 +432,10 @@ const currentYearEl = document.getElementById('current-year');
 const availableMoneyEl = document.getElementById('available-money');
 const totalWealthEl = document.getElementById('total-wealth');
 
+// Références pour les conteneurs de modules
+const modulesContainer = document.getElementById('modules-container');
+const bottomModules = document.getElementById('bottom-modules');
+
 // Références aux éléments du DOM pour Actifs Alternatifs
 const actifsInvestedAmountsEl = document.getElementById('actifs-investedAmounts');
 const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
@@ -464,6 +481,72 @@ function initIntro() {
   showIntroScreen();
   playButton.addEventListener('click', handlePlayButtonClick);
 }
+
+// Fonctions spécifiques pour les conteneurs de modules
+
+  // Fonction pour vérifier si un module est activé
+  function checkModuleActivation(moduleName) {
+    switch(moduleName) {
+      case 'livretA':
+        return true; // toujours activé
+      case 'obligations':
+        return currentYearIndex >= 2;
+      case 'actions':
+        return currentYearIndex >= 3;
+      case 'residencePrincipale':
+        return currentYearIndex >= 5;
+      case 'fondsImmobiliers':
+        return currentYearIndex >= 7;
+      case 'actifsAlternatifs':
+        return currentYearIndex >= 10;
+      default:
+        return false;
+    }
+  }
+  /**
+   * Met à jour la disposition des modules en fonction des modules activés et des jalons temporels.
+   */
+  function updateModulesLayout() {
+    if (currentYearIndex >= 5) {
+      bottomModules.classList.remove('hidden');
+    }
+
+    if (currentYearIndex >= 7) {
+      fondsImmobiliersModule.element.classList.remove('hidden');
+    }
+
+    if (currentYearIndex >= 10) {
+      actifsAlternatifsModule.element.classList.remove('hidden');
+    }
+
+    // Adapter l'orientation des modules en haut selon l'état
+    if (currentYearIndex >= 5) {
+      const topModules = document.querySelector('.top-modules');
+      topModules.style.flexDirection = 'row';
+      topModules.style.justifyContent = 'center';
+    } else {
+      const topModules = document.querySelector('.top-modules');
+      topModules.style.flexDirection = 'column';
+      topModules.style.justifyContent = 'flex-start';
+    }
+  }
+
+  /**
+   * Vérifie les jalons temporels et active les modules si nécessaire.
+   */
+  function checkTimeMilestones() {
+    if (currentYearIndex === 5 && currentMonthIndex % 12 === 0) {
+      residenceModule.activate();
+    }
+
+    if (currentYearIndex === 7 && currentMonthIndex % 12 === 0) {
+      fondsImmobiliersModule.activate();
+    }
+
+    if (currentYearIndex === 10 && currentMonthIndex % 12 === 0) {
+      actifsAlternatifsModule.activate();
+    }
+  }
 
 // Fonctions spécifiques du module Obligations
 function handleObligationsInvest() {
@@ -801,6 +884,10 @@ function startGame() {
 
     // Vérifier et afficher les overlays si nécessaire
     checkAndShowOverlays();
+
+    // Vérifier les jalons temporels pour mettre à jour la disposition
+    checkTimeMilestones();
+    updateModulesLayout();
 
   }, 500); // Interval en ms qui représente un mois
 }
