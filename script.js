@@ -12,7 +12,7 @@
    
    // Informations de base
    const initialAge = 22;
-   const totalYears = 20; // Durée de la simulation en années
+   const totalYears = 12; // Durée de la simulation en années
    
    // Indices temporels
    let currentYearIndex = 1;   // 1 = première année
@@ -1046,7 +1046,6 @@
      const module = document.querySelector(`.module[data-module="${moduleName}"]`);
      if (module) {
        module.classList.remove('hidden');
-       console.log(`Module ${moduleName} activé.`);
      } else {
        console.warn(`Module ${moduleName} non trouvé.`);
      }
@@ -1071,14 +1070,15 @@
     */
    function startGame() {
      gameInterval = setInterval(() => {
-       if (currentMonthIndex < (totalYears * 12) - 1) {
-         currentMonthIndex++;
-       } else {
-         // Fin de partie (code temporaire)
-         alert("Fin de partie");
-         clearInterval(gameInterval);
-         return;
-       }
+        if (currentMonthIndex < (totalYears * 12) - 1) {
+          currentMonthIndex++;
+        } else {
+          // Fin de partie
+          clearInterval(gameInterval);
+          showEndScreen();
+          return;
+        }
+      
    
        currentYearIndex = Math.floor(currentMonthIndex / 12) + 1;
    
@@ -1110,8 +1110,9 @@
          updateActifsProfits();
        }
    
-       // Mettre à jour l'interface utilisateur
+       // Mettre à jour l'interface utilisateur et sauvegarder les données
        updateUI();
+       saveData();
    
        // Vérifier et afficher les overlays si nécessaire
        checkAndShowOverlays();
@@ -1122,7 +1123,97 @@
    
      }, 500); // Intervalle en ms qui représente un mois
    }
-   
+
+    /* -----------------------------
+    Fonctions de Fin de Partie
+    ----------------------------- */
+
+    /**
+     * Affiche la page de fin de partie avec les statistiques.
+     */
+    function showEndScreen() {
+      pauseGame();
+      gameContainer.classList.add('hidden');
+
+      const endScreen = document.getElementById('end-screen');
+      document.getElementById('stats-years').textContent = currentYearIndex;
+      document.getElementById('stats-totalMoney').textContent = formatNumber(availableMoney + livretA + obligations + actions + residenceInvestedAmount + fondsImmobiliers);
+      document.getElementById('stats-livretA').textContent = formatNumber(livretA);
+      document.getElementById('stats-actions').textContent = formatNumber(actions);
+      document.getElementById('stats-obligations').textContent = formatNumber(obligations);
+      document.getElementById('stats-residence').textContent = formatNumber(residenceInvestedAmount + residenceProfit);
+      document.getElementById('stats-fondsImmobiliers').textContent = formatNumber(fondsImmobiliers);
+      document.getElementById('stats-actifsProfit').textContent = formatNumber(actifsAlternatifsTotalProfit);
+      document.getElementById('end-message').textContent = `Félicitations ! Vous avez complété la simulation en ${currentYearIndex} années. Voici vos résultats :`;
+
+      endScreen.classList.remove('hidden');
+
+      // Bouton "Rejouer"
+      const restartButton = document.getElementById('restart-button');
+      restartButton.addEventListener('click', restartGame);
+    }
+
+    /**
+     * Redémarre le jeu en réinitialisant les variables et l'interface.
+     */
+    function restartGame() {
+      // Réinitialiser les variables globales
+      currentYearIndex = 1;
+      currentMonthIndex = 0;
+      availableMoney = 100000;
+      livretA = 0;
+      livretAProfit = 0;
+      obligations = 0;
+      obligationsProfit = 0;
+      actions = 0;
+      actionsProfit = 0;
+      residenceInvested = false;
+      residenceInvestedAmount = 0;
+      residenceProfit = 0;
+      fondsImmobiliers = 0;
+      fondsImmobiliersProfit = 0;
+      actifsAlternatifsInvestments = [];
+      actifsAlternatifsTotalProfit = 0;
+      isOverlayActive = false;
+
+      // Cacher les modules spécifiques
+      if (obligationsModule.element) obligationsModule.element.classList.add('hidden');
+      if (actionsModule.element) actionsModule.element.classList.add('hidden');
+      if (bottomModules) bottomModules.classList.add('hidden');
+      if (fondsImmobiliersModule.element) fondsImmobiliersModule.element.classList.add('hidden');
+      if (actifsAlternatifsModule.element) actifsAlternatifsModule.element.classList.add('hidden');
+
+      // Réinitialiser l'état des modules Résidence Principale
+      const residenceState1 = residenceModule.element.querySelector('.residence-state.state-1');
+      const residenceState2 = residenceModule.element.querySelector('.residence-state.state-2');
+      if (residenceState1) residenceState1.classList.remove('hidden');
+      if (residenceState2) residenceState2.classList.add('hidden');
+
+      // Définir les overlays comme non activés
+      obligationsModule.activated = false;
+      actionsModule.activated = false;
+
+      // Sauvegarder les données réinitialisées dans le localStorage
+      saveData();
+
+      updateUI();
+      const endScreen = document.getElementById('end-screen');
+      endScreen.classList.add('hidden');
+
+      gameContainer.classList.remove('hidden');
+
+      startGame();
+    }
+
+    /**
+     * Formate un nombre avec des séparateurs de milliers.
+     * @param {number} number - Le nombre à formater.
+     * @returns {string} - Le nombre formaté.
+     */
+    function formatNumber(number) {
+      return number.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'");
+    }
+
    /* -----------------------------
       Fonctions de Contrôle du Jeu
       ----------------------------- */
