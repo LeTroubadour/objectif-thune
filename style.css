@@ -172,6 +172,11 @@ body {
   margin-bottom: 30px;
 }
 
+.dashboard-toggle-container {
+  display: flex;
+  gap: 10px;
+}
+
 .dashboard-title {
   font-size: 1.1em;
   font-weight: bold;

@@ -23,6 +23,9 @@
    
    // Argent disponible initial
    let availableMoney = 100000;
+   let totalWealth = availableMoney;
+   let totalProfit = 0;
+   let isShowingTotalWealth = true;
    
    // Modules d'investissement spécifiques
    let livretA = 0;
@@ -95,7 +98,9 @@
    const gameContainer = document.getElementById('game-container');
    const currentYearEl = document.getElementById('current-year');
    const availableMoneyEl = document.getElementById('available-money');
-   const totalWealthEl = document.getElementById('total-wealth');
+   const dashboardToggleButton = document.getElementById('dashboard-toggle-button');
+   const dashboardToggleTitle = document.getElementById('dashboard-toggle-title');
+   const dashboardToggleContent = document.getElementById('dashboard-toggle-content');
    
    // Conteneurs de modules
    const modulesContainer = document.getElementById('modules-container');
@@ -109,10 +114,56 @@
    const overlayObligations = document.getElementById('overlay-obligations');
    const overlayActions = document.getElementById('overlay-actions');
    
+   // Écran de Fin
+   const endScreen = document.getElementById('end-screen');
+   const restartButton = document.getElementById('restart-button');
+   
    /* -----------------------------
       Fonctions Utilitaires
       ----------------------------- */
    
+    /**
+     * Calcule le Patrimoine Total (Total Assets)
+     * @returns {number}
+     */
+    function calculateTotalWealth() {
+      return availableMoney + livretA + actions + obligations + residenceInvestedAmount + fondsImmobiliers + actifsAlternatifsInvestments.reduce((sum, inv) => sum + inv.amount, 0);
+    }
+
+    /**
+     * Calcule le Profit Total (Total Profit)
+     * @returns {number}
+     */
+    function calculateTotalProfit() {
+      return livretAProfit + actionsProfit + obligationsProfit + residenceProfit + fondsImmobiliersProfit + actifsAlternatifsTotalProfit;
+    }
+
+    /**
+     * Met à Jour l'Affichage du Dashboard en Fonction de l'État du Toggle
+     */
+    function updateDashboardToggle() {
+      totalWealth = calculateTotalWealth();
+      totalProfit = calculateTotalProfit();
+      if (isShowingTotalWealth) {
+        dashboardToggleTitle.textContent = 'Patrimoine Total';
+        dashboardToggleContent.textContent = `€${totalWealth.toLocaleString('fr-FR')}`;
+        dashboardToggleButton.setAttribute('aria-pressed', 'true');
+      } else {
+        dashboardToggleTitle.textContent = 'Profit Total';
+        dashboardToggleContent.textContent = `€${totalProfit.toLocaleString('fr-FR')}`;
+        dashboardToggleButton.setAttribute('aria-pressed', 'false');
+      }
+    }
+    
+    /**
+     * Gestionnaire spécifique pour le toggle du Dashboard.
+     */
+    function handleDashboardToggle() {
+      isShowingTotalWealth = !isShowingTotalWealth;
+      updateDashboardToggle();
+      saveData();
+    }
+
    /**
     * Ajoute une ligne d'investissement dans l'interface utilisateur pour Actifs Alternatifs.
     * @param {Object} investment - Objet d'investissement
@@ -131,8 +182,8 @@
     * Calcule et met à jour le total des profits dans l'UI pour Actifs Alternatifs.
     */
    function calculateActifsTotalProfit() {
-     const totalProfit = actifsAlternatifsInvestments.reduce((acc, investment) => acc + investment.profit, 0);
-     actifsTotalProfitEl.textContent = `${totalProfit.toLocaleString('fr-FR')} €`;
+     const ActifsTotalProfit = actifsAlternatifsInvestments.reduce((acc, investment) => acc + investment.profit, 0);
+     actifsTotalProfitEl.textContent = `${ActifsTotalProfit.toLocaleString('fr-FR')} €`;
    }
    
    /**
@@ -189,8 +240,7 @@
        <span class="dashboard-amount">${totalYears}</span>
      `;
      availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
-     const totalWealth = availableMoney + livretA + obligations + actions + residenceInvestedAmount + fondsImmobiliers;
-     totalWealthEl.textContent = `€${totalWealth.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
+     updateDashboardToggle();
    
      // Mise à jour des modules d'investissement
      livretAModule.updateModuleUI();
@@ -207,6 +257,12 @@
    function saveData() {
      try {
        // Sauvegarde des autres modules
+       localStorage.setItem('currentYearIndex', currentYearIndex);
+       localStorage.setItem('currentMonthIndex', currentMonthIndex);
+       localStorage.setItem('availableMoney', availableMoney);
+       localStorage.setItem('dashboardToggleState', isShowingTotalWealth ? 'assets' : 'profit');
+       localStorage.setItem('totalWealth', totalWealth);
+       localStorage.setItem('totalProfit', totalProfit);
        localStorage.setItem('livretA', livretA);
        localStorage.setItem('livretAProfit', livretAProfit);
        localStorage.setItem('obligations', obligations);
@@ -219,6 +275,7 @@
        localStorage.setItem('fondsImmobiliers', fondsImmobiliers);
        localStorage.setItem('fondsImmobiliersProfit', fondsImmobiliersProfit);
        localStorage.setItem('actifsAlternatifsInvestments', JSON.stringify(actifsAlternatifsInvestments));
+       localStorage.setItem('actifsAlternatifsTotalProfit', actifsAlternatifsTotalProfit);
      } catch (error) {
        console.error('Erreur lors de la sauvegarde des données:', error);
      }
@@ -229,7 +286,32 @@
     */
    function loadData() {
      try {
-       // Chargement des investissements dans Actifs Alternatifs
+       currentYearIndex = parseInt(localStorage.getItem('currentYearIndex'), 10) || 1;
+       currentMonthIndex = parseInt(localStorage.getItem('currentMonthIndex'), 10) || 0;
+       availableMoney = parseFloat(localStorage.getItem('availableMoney')) || 0;
+       const savedToggleState = localStorage.getItem('dashboardToggleState');
+       if (savedToggleState === 'profit') {
+         isShowingTotalWealth = false;
+       } else {
+         isShowingTotalWealth = true;
+       }
+       totalWealth = parseFloat(localStorage.getItem('totalWealth')) || 0;
+       totalProfit = parseFloat(localStorage.getItem('totalProfit')) || 0;
+       livretA = parseFloat(localStorage.getItem('livretA')) || 0;
+       livretAProfit = parseFloat(localStorage.getItem('livretAProfit')) || 0;
+       obligations = parseFloat(localStorage.getItem('obligations')) || 0;
+       obligationsProfit = parseFloat(localStorage.getItem('obligationsProfit')) || 0;
+       actions = parseFloat(localStorage.getItem('actions')) || 0;
+       actionsProfit = parseFloat(localStorage.getItem('actionsProfit')) || 0;
+       residenceInvested = localStorage.getItem('residenceInvested') === 'true';
+       if (residenceInvested) {
+        residenceModule.showInvestedState();
+       }
+       residenceInvestedAmount = parseFloat(localStorage.getItem('residenceInvestedAmount')) || 0;
+       residenceProfit = parseFloat(localStorage.getItem('residenceProfit')) || 0;
+       fondsImmobiliers = parseFloat(localStorage.getItem('fondsImmobiliers')) || 0;
+       fondsImmobiliersProfit = parseFloat(localStorage.getItem('fondsImmobiliersProfit')) || 0;
+       actifsAlternatifsTotalProfit = parseFloat(localStorage.getItem('actifsAlternatifsTotalProfit')) || 0;
        const actifsData = localStorage.getItem('actifsAlternatifsInvestments');
        if (actifsData) {
          actifsAlternatifsInvestments = JSON.parse(actifsData);
@@ -238,31 +320,10 @@
          });
          calculateActifsTotalProfit();
        }
-   
-       // Chargement des autres modules
-       livretA = parseFloat(localStorage.getItem('livretA')) || 0;
-       livretAProfit = parseFloat(localStorage.getItem('livretAProfit')) || 0;
-   
-       obligations = parseFloat(localStorage.getItem('obligations')) || 0;
-       obligationsProfit = parseFloat(localStorage.getItem('obligationsProfit')) || 0;
-   
-       actions = parseFloat(localStorage.getItem('actions')) || 0;
-       actionsProfit = parseFloat(localStorage.getItem('actionsProfit')) || 0;
-   
-       residenceInvested = localStorage.getItem('residenceInvested') === 'true';
-       residenceInvestedAmount = parseFloat(localStorage.getItem('residenceInvestedAmount')) || 0;
-       residenceProfit = parseFloat(localStorage.getItem('residenceProfit')) || 0;
-   
-       fondsImmobiliers = parseFloat(localStorage.getItem('fondsImmobiliers')) || 0;
-       fondsImmobiliersProfit = parseFloat(localStorage.getItem('fondsImmobiliersProfit')) || 0;
-   
-       // Mise à jour de l'interface utilisateur après chargement
-       updateUI();
-   
-       // Mise à jour des états des modules Résidence Principale
-       if (residenceInvested) {
-         residenceModule.showInvestedState();
-       }
+       actifsAlternatifsTotalProfit = parseFloat(localStorage.getItem('actifsAlternatifsTotalProfit')) || 0;
+
+      updateUI();
+
      } catch (error) {
        console.error('Erreur lors du chargement des données:', error);
      }
@@ -278,23 +339,23 @@
    class InvestmentModule {
      constructor(moduleName, options = {}) {
        this.moduleName = moduleName;
-       this.element = document.querySelector(`.module[data-module="${moduleName}"]`);
+       this.element = document.querySelector(`[data-module="${moduleName}"]`);
        if (!this.element) {
-         console.warn(`Élément DOM pour le module "${moduleName}" non trouvé.`);
-         return;
-       }
+        console.warn(`Élément DOM pour l'instance' "${moduleName}" non trouvé.`);
+        return;
+      }
    
        // Boutons et éléments des modules
-       this.investButton = this.element.querySelector('.invest-button');         // Bouton "Investir"
-       this.withdrawButton = this.element.querySelector('.withdraw-button');     // Bouton "Retirer"
-       this.sellButton = this.element.querySelector('.sell-button');             // Bouton "Vendre" (Résidence Principale)
-       this.toggleButton = this.element.querySelector('.toggle-button');         // Bouton pour basculer montant/profit
-       this.toggleContent = this.element.querySelector('.toggle-content');
-       this.amountEl = this.element.querySelector('.module-amount.active');      // Élément affichant le montant investi
-       this.profitEl = this.element.querySelector('.module-amount:not(.active)'); // Élément affichant les profits
+       this.investButton = this.element?.querySelector('.invest-button');         // Bouton "Investir"
+       this.withdrawButton = this.element?.querySelector('.withdraw-button');     // Bouton "Retirer"
+       this.sellButton = this.element?.querySelector('.sell-button');             // Bouton "Vendre" (Résidence Principale)
+       this.toggleButton = this.element?.querySelector('.toggle-button');         // Bouton pour basculer montant/profit
+       this.toggleContent = this.element?.querySelector('.toggle-content');
+       this.amountEl = this.element?.querySelector('.module-amount.active');      // Élément affichant le montant investi
+       this.profitEl = this.element?.querySelector('.module-amount:not(.active)'); // Élément affichant les profits
    
        // Formulaire d'action (investir/retirer)
-       this.actionForm = this.element.querySelector('.action-form');
+       this.actionForm = this.element?.querySelector('.action-form');
        this.closeIcon = this.actionForm?.querySelector('.close-icon');           
        this.actionAmountInput = this.actionForm?.querySelector('.action-amount');
        this.maxButton = this.actionForm?.querySelector('.max-button');           
@@ -309,7 +370,7 @@
        this.customWithdrawHandler = options.customWithdrawHandler || null;
    
        // Propriété pour gérer l'activation d'un overlay
-       this.activated = false;
+       this.overlayActivated = false;
    
        // Initialisation des gestionnaires d'événements
        this.init();
@@ -319,62 +380,69 @@
       * Initialise les gestionnaires d'événements pour les modules.
       */
      init() {
-       // Gestionnaire pour le bouton Investir
-       if (this.investButton) {
-         if (this.customInvestHandler) {
-           this.investButton.addEventListener('click', this.customInvestHandler);
-         } else {
-           this.investButton.addEventListener('click', () => this.openActionForm('invest'));
-         }
-       }
-   
-       // Gestionnaire pour le bouton Retirer
-       if (this.withdrawButton) {
-         if (this.customWithdrawHandler) {
-           this.withdrawButton.addEventListener('click', this.customWithdrawHandler);
-         } else {
-           this.withdrawButton.addEventListener('click', () => this.openActionForm('withdraw'));
-         }
-       }
-   
-       // Gestionnaire pour le bouton Vendre (Résidence Principale)
-       if (this.sellButton) {
-         if (this.customWithdrawHandler && this.moduleName === 'residencePrincipale') {
-           this.sellButton.addEventListener('click', this.customWithdrawHandler);
-         }
-       }
-   
-       // Gestionnaire pour fermer le formulaire d'action
-       if (this.closeIcon && this.actionForm) {
-         this.closeIcon.addEventListener('click', () => this.closeActionForm());
-       }
-   
-       // Gestionnaire pour le bouton MAX
-       if (this.maxButton) {
-         this.maxButton.addEventListener('click', () => this.setMaxAmount());
-       }
-   
-       // Gestionnaire pour confirmer l'action
-       if (this.confirmButton) {
-         this.confirmButton.addEventListener('click', () => this.confirmAction());
-       }
-   
-       // Gestionnaire pour le toggle montant/profit
-       if (this.toggleButton) {
-         this.toggleButton.addEventListener('click', () => this.toggleAmountProfit());
-       }
-   
-       // Gestion des Durées (pour Actifs Alternatifs)
-       if (this.durationButtons.length > 0) {
-         this.durationButtons.forEach(button => {
-           button.addEventListener('click', () => this.selectDuration(button));
-         });
-       }
-   
+      if (this.moduleName !== 'dashboard') {
+        // Gestionnaire pour le bouton Investir
+        if (this.investButton) {
+          if (this.customInvestHandler) {
+            this.investButton.addEventListener('click', this.customInvestHandler);
+          } else {
+            this.investButton.addEventListener('click', () => this.openActionForm('invest'));
+          }
+        }
+    
+        // Gestionnaire pour le bouton Retirer
+        if (this.withdrawButton) {
+          if (this.customWithdrawHandler) {
+            this.withdrawButton.addEventListener('click', this.customWithdrawHandler);
+          } else {
+            this.withdrawButton.addEventListener('click', () => this.openActionForm('withdraw'));
+          }
+        }
+    
+        // Gestionnaire pour le bouton Vendre (Résidence Principale)
+        if (this.sellButton) {
+          if (this.customWithdrawHandler && this.moduleName === 'residencePrincipale') {
+            this.sellButton.addEventListener('click', this.customWithdrawHandler);
+          }
+        }
+    
+        // Gestionnaire pour fermer le formulaire d'action
+        if (this.closeIcon && this.actionForm) {
+          this.closeIcon.addEventListener('click', () => this.closeActionForm());
+        }
+    
+        // Gestionnaire pour le bouton MAX
+        if (this.maxButton) {
+          this.maxButton.addEventListener('click', () => this.setMaxAmount());
+        }
+    
+        // Gestionnaire pour confirmer l'action
+        if (this.confirmButton) {
+          this.confirmButton.addEventListener('click', () => this.confirmAction());
+        }
+    
+        // Gestionnaire pour le toggle montant/profit
+        if (this.toggleButton) {
+          this.toggleButton.addEventListener('click', () => this.toggleAmountProfit());
+        }
+    
+        // Gestion des Durées (pour Actifs Alternatifs)
+        if (this.durationButtons.length > 0) {
+          this.durationButtons.forEach(button => {
+            button.addEventListener('click', () => this.selectDuration(button));
+          });
+        }
+      } else {
+        // Gestion spécifique pour le toggle du Dashboard (pas d'element)
+        if (this.toggleButton) {
+          this.toggleButton.addEventListener('click', this.customInvestHandler);
+        }
+      }
+
        // Charger l'état d'activation depuis les données sauvegardées
-       this.activated = checkModuleActivation(this.moduleName);
-       if (this.activated) {
-         this.activate();
+       this.overlayActivated = checkModuleActivation(this.moduleName);
+       if (this.overlayActivated) {
+        this.activate();
        }
    
        // Charger les données depuis localStorage
@@ -434,7 +502,7 @@
       * Active le module en l'affichant et en mettant à jour l'état.
       */
      activate() {
-       this.activated = true;
+       this.overlayActivated = true;
        this.element.classList.remove('hidden');
        updateModulesLayout();
      }
@@ -744,9 +812,12 @@
    }
    
    /* -----------------------------
-      Instances des Modules d'Investissement
+      Instances
       ----------------------------- */
    
+   const dashboardModule = new InvestmentModule('dashboard', {
+     customInvestHandler: handleDashboardToggle
+   });
    const livretAModule = new InvestmentModule('livretA');
    const actionsModule = new InvestmentModule('actions');
    const obligationsModule = new InvestmentModule('obligations', {
@@ -1099,7 +1170,11 @@
        currentYearIndex = Math.floor(currentMonthIndex / 12) + 1;
    
        // Augmenter l'argent disponible chaque mois
-       availableMoney += 100;
+       availableMoney += 1000;
+
+       // Calculer le total de la richesse et du profit
+       totalWealth = calculateTotalWealth();
+       totalProfit = calculateTotalProfit();
    
        // Appliquer les rendements mensuels pour Livret A
        const livretAMonthlyRate = monthlyLivretARates[currentMonthIndex];
@@ -1133,7 +1208,7 @@
        // Vérifier et afficher les overlays si nécessaire
        checkAndShowOverlays();
    
-       // Vérifier les jalons temporels pour mettre à jour la disposition
+       // Vérifier les jalons temporels pour mettre à jour la disposition des modules d'investissement
        checkTimeMilestones();
        updateModulesLayout();
    
@@ -1151,7 +1226,6 @@
       pauseGame();
       gameContainer.classList.add('hidden');
 
-      const endScreen = document.getElementById('end-screen');
       document.getElementById('stats-years').textContent = currentYearIndex;
       document.getElementById('stats-totalMoney').textContent = formatNumber(availableMoney + livretA + obligations + actions + residenceInvestedAmount + fondsImmobiliers);
       document.getElementById('stats-livretA').textContent = formatNumber(livretA);
@@ -1164,8 +1238,7 @@
 
       endScreen.classList.remove('hidden');
 
-      // Bouton "Rejouer"
-      const restartButton = document.getElementById('restart-button');
+      restartButton.removeEventListener('click', restartGame); // Éviter les doublons
       restartButton.addEventListener('click', restartGame);
     }
 
@@ -1177,6 +1250,8 @@
       currentYearIndex = 1;
       currentMonthIndex = 0;
       availableMoney = 100000;
+      totalWealth = 100000;
+      totalProfit = 0;
       livretA = 0;
       livretAProfit = 0;
       obligations = 0;
@@ -1192,6 +1267,10 @@
       actifsAlternatifsTotalProfit = 0;
       isOverlayActive = false;
 
+      // Réinitialiser l'état du toggle Dashboard
+      isShowingTotalWealth = true;
+      updateDashboardToggle();
+      
       // Cacher les modules spécifiques
       if (obligationsModule.element) obligationsModule.element.classList.add('hidden');
       if (actionsModule.element) actionsModule.element.classList.add('hidden');
@@ -1206,18 +1285,15 @@
       if (residenceState2) residenceState2.classList.add('hidden');
 
       // Définir les overlays comme non activés
-      obligationsModule.activated = false;
-      actionsModule.activated = false;
+      obligationsModule.overlayActivated = false;
+      actionsModule.overlayActivated = false;
 
       // Sauvegarder les données réinitialisées dans le localStorage
       saveData();
 
       updateUI();
-      const endScreen = document.getElementById('end-screen');
       endScreen.classList.add('hidden');
-
       gameContainer.classList.remove('hidden');
-
       startGame();
     }
 
@@ -1292,14 +1368,14 @@
     * Vérifie et affiche les overlays en fonction de l'année écoulée.
     */
    function checkAndShowOverlays() {
-     if (currentYearIndex === 2 && currentMonthIndex % 12 === 0 && !obligationsModule.activated) {
+     if (currentYearIndex === 2 && currentMonthIndex % 12 === 0 && !obligationsModule.overlayActivated) {
        showOverlay(overlayObligations);
-       obligationsModule.activated = true;
+       obligationsModule.overlayActivated = true;
      }
    
-     if (currentYearIndex === 3 && currentMonthIndex % 12 === 0 && !actionsModule.activated) {
+     if (currentYearIndex === 3 && currentMonthIndex % 12 === 0 && !actionsModule.overlayActivated) {
        showOverlay(overlayActions);
-       actionsModule.activated = true;
+       actionsModule.overlayActivated = true;
      }
    }
    
