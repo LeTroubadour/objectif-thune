@@ -911,6 +911,7 @@
      const prevButton = overlayElement.querySelector('.prev-button');
      const nextButton = overlayElement.querySelector('.next-button');
      const continueButton = overlayElement.querySelector('.overlay-continue-button');
+     const dots = document.querySelectorAll('.nav-dot');
      let currentMessageIndex = 0;
    
      /**
@@ -933,6 +934,15 @@
          continueButton.classList.add('hidden');
        }
      }
+
+     /**
+      * Animation des points pour indiquer le message actif
+      */
+     function updateDots() {
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentMessageIndex);
+      });
+    }
    
      // Initialiser l'affichage
      showMessage(currentMessageIndex);
@@ -940,16 +950,22 @@
      // Gestionnaire pour le bouton Précédent
      prevButton.onclick = () => {
        if (currentMessageIndex > 0) {
+         messages[currentMessageIndex].classList.remove('active');
          currentMessageIndex--;
+         messages[currentMessageIndex].classList.add('active');
          showMessage(currentMessageIndex);
+         updateDots();
        }
      };
    
      // Gestionnaire pour le bouton Suivant
      nextButton.onclick = () => {
        if (currentMessageIndex < messages.length - 1) {
-         currentMessageIndex++;
+        messages[currentMessageIndex].classList.remove('active');        
+        currentMessageIndex++;
+        messages[currentMessageIndex].classList.add('active');
          showMessage(currentMessageIndex);
+         updateDots();
        }
      };
    
@@ -1295,9 +1311,10 @@
     * Initialise le jeu en chargeant les données et en démarrant l'intervalle de jeu.
     */
    function init() {
-     loadData();
+     restartGame();
+     /*loadData();
      updateUI();
-     startGame();
+     startGame();*/
    }
    
    // Appel de l'initialisation de l'intro au chargement de la page

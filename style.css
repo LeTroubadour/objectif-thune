@@ -63,8 +63,9 @@
   
   /* Overlays */
   --overlay-bg-color: rgba(0, 0, 0, 0.7);
-  --overlay-container-bg-color: var(--neutral-dark);
-  --overlay-content-bg-color: var(--neutral-dark);
+  --overlay-container-bg-color: var(--primary-bittersweet-dark);
+  --overlay-inner-border-color: var(--primary-lavander-dark);
+  --overlay-content-bg-color: var(--primary-bittersweet-dark);
   --overlay-content-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --overlay-text-color: var(--neutral-light);
   --overlay-nav-color: var(--neutral-light);
@@ -479,6 +480,18 @@ body {
     justify-content: center;
     align-items: center;
   }
+    /* Pseudo-element to create inner-border */
+    .overlay-container:before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      bottom: 10px;
+      left: 10px;
+      border: 2px solid var(--overlay-inner-border-color);
+      border-radius: inherit;
+      pointer-events: none;
+    }
 
   /* Contenu de l'Overlay */
   .overlay-content {
@@ -487,7 +500,7 @@ body {
     border-radius: 10px;
     width: 80%;
     max-width: 600px;
-    box-shadow: var(--overlay-content-shadow);
+    /*box-shadow: var(--overlay-content-shadow);*/
     text-align: center;
     position: relative;
     z-index: 2100;                       /* Au-dessus de l'overlay background */
@@ -556,6 +569,25 @@ body {
 
   .overlay-continue-button:hover {
     background-color: var(--primary-bittersweet-dark);
+  }
+
+  /* Points de navigation */
+  .nav-dots {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .nav-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: var(--neutral-light);
+    border-radius: 50%;
+  }
+  
+  .nav-dot.active {
+    background-color: var(--primary-lavander-light);
   }
 
   /* Dashboard avec filtre lorsque l'overlay est actif */
