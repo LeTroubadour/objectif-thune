@@ -111,8 +111,12 @@
    const actifsTotalProfitEl = document.getElementById('actifs-totalProfit');
    
    // Overlays
+   const overlayLivretA = document.getElementById('overlay-livretA');
    const overlayObligations = document.getElementById('overlay-obligations');
    const overlayActions = document.getElementById('overlay-actions');
+   const overlayResidencePrincipale = document.getElementById('overlay-residencePrincipale');
+   const overlayFondsImmobiliers = document.getElementById('overlay-fondsImmobiliers');
+   const overlayActifsAlternatifs = document.getElementById('overlay-actifsAlternatifs');
    
    // Écran de Fin
    const endScreen = document.getElementById('end-screen');
@@ -982,7 +986,7 @@
      const prevButton = overlayElement.querySelector('.prev-button');
      const nextButton = overlayElement.querySelector('.next-button');
      const continueButton = overlayElement.querySelector('.overlay-continue-button');
-     const dots = document.querySelectorAll('.nav-dot');
+     const dots = overlayElement.querySelectorAll('.nav-dot');
      let currentMessageIndex = 0;
    
      /**
@@ -1267,26 +1271,36 @@
       actifsAlternatifsTotalProfit = 0;
       isOverlayActive = false;
 
-      // Réinitialiser l'état du toggle Dashboard
+      // Réinitialiser l'affichage du Dashboard
       isShowingTotalWealth = true;
       updateDashboardToggle();
       
-      // Cacher les modules spécifiques
+      // Réinitialiser l'affichage des modules d'investissement
       if (obligationsModule.element) obligationsModule.element.classList.add('hidden');
       if (actionsModule.element) actionsModule.element.classList.add('hidden');
       if (bottomModules) bottomModules.classList.add('hidden');
       if (fondsImmobiliersModule.element) fondsImmobiliersModule.element.classList.add('hidden');
       if (actifsAlternatifsModule.element) actifsAlternatifsModule.element.classList.add('hidden');
 
-      // Réinitialiser l'état des modules Résidence Principale
+      // Réinitialiser l'état du module Résidence Principale
       const residenceState1 = residenceModule.element.querySelector('.residence-state.state-1');
       const residenceState2 = residenceModule.element.querySelector('.residence-state.state-2');
       if (residenceState1) residenceState1.classList.remove('hidden');
       if (residenceState2) residenceState2.classList.add('hidden');
 
-      // Définir les overlays comme non activés
+      // Réinitialiser les overlays
+      livretAModule.overlayActivated = false;
+      hideOverlay(overlayLivretA);
       obligationsModule.overlayActivated = false;
+      hideOverlay(overlayObligations);
       actionsModule.overlayActivated = false;
+      hideOverlay(overlayActions);
+      residenceModule.overlayActivated = false;
+      hideOverlay(overlayResidencePrincipale);
+      fondsImmobiliersModule.overlayActivated = false;
+      hideOverlay(overlayFondsImmobiliers);
+      actifsAlternatifsModule.overlayActivated = false;
+      hideOverlay(overlayActifsAlternatifs);
 
       // Sauvegarder les données réinitialisées dans le localStorage
       saveData();
@@ -1350,7 +1364,13 @@
    function handlePlayButtonClick() {
      hideIntroScreen();
      init();
-   }
+
+     // Afficher l'overlay du Livret A dès le début
+     setTimeout(() => {
+       showOverlay(overlayLivretA);
+       livretAModule.overlayActivated = true;
+     }, 100); // Petit délai pour assurer que l'interface est prête
+  }
    
    /**
     * Initialisation spécifique pour l'écran d'introduction.
@@ -1368,6 +1388,11 @@
     * Vérifie et affiche les overlays en fonction de l'année écoulée.
     */
    function checkAndShowOverlays() {
+     if (currentYearIndex === 1 && currentMonthIndex % 12 === 0 && !livretAModule.overlayActivated) {
+       showOverlay(overlayLivretA);
+       livretAModule.overlayActivated = true;
+     }
+
      if (currentYearIndex === 2 && currentMonthIndex % 12 === 0 && !obligationsModule.overlayActivated) {
        showOverlay(overlayObligations);
        obligationsModule.overlayActivated = true;
@@ -1376,6 +1401,21 @@
      if (currentYearIndex === 3 && currentMonthIndex % 12 === 0 && !actionsModule.overlayActivated) {
        showOverlay(overlayActions);
        actionsModule.overlayActivated = true;
+     }
+  
+     if (currentYearIndex === 5 && currentMonthIndex % 12 === 0 && !residenceModule.overlayActivated) {
+       showOverlay(overlayResidencePrincipale);
+       residenceModule.overlayActivated = true;
+     }
+  
+     if (currentYearIndex === 7 && currentMonthIndex % 12 === 0 && !fondsImmobiliersModule.overlayActivated) {
+       showOverlay(overlayFondsImmobiliers);
+       fondsImmobiliersModule.overlayActivated = true;
+     }
+  
+     if (currentYearIndex === 10 && currentMonthIndex % 12 === 0 && !actifsAlternatifsModule.overlayActivated) {
+       showOverlay(overlayActifsAlternatifs);
+       actifsAlternatifsModule.overlayActivated = true;
      }
    }
    
