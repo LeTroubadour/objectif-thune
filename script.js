@@ -5,6 +5,7 @@
    ----------------------------- */
    import { MonthlyLivretAReturns } from './livretA_rates.js';
    import { MonthlyActionsReturns } from './actions_rates.js';
+   import { actifsAlternatifsROIs } from './actifsAlternatifs_rates.js';
    
    /* -----------------------------
       Variables Globales
@@ -168,6 +169,37 @@
       saveData();
     }
 
+    /**
+     * Sélectionne un ROI final basé sur les probabilités pour les Actifs Alternatifs.
+     * @param {string} duree - Durée de l'investissement ("3ans" ou "7ans").
+     * @returns {number} - ROI final sélectionné.
+     */
+    function selectFinalROI(duree) {
+      const rois = actifsAlternatifsROIs[duree];
+      const rand = Math.random() * 100;
+      let cumulative = 0;
+
+      for (let roi of rois) {
+        cumulative += roi.probability;
+        if (rand < cumulative) {
+          return roi.roiFinal;
+        }
+      }
+
+      // Fallback au dernier ROI si rien n'est sélectionné
+      return rois[rois.length - 1].roiFinal;
+    }
+
+    /**
+     * Calcule le ROI mensuel basé sur le ROI final et la durée.
+     * @param {number} roiFinal - ROI final en pourcentage.
+     * @param {number} dureeEnMois - Durée de l'investissement en mois.
+     * @returns {number} - ROI mensuel en décimal.
+     */
+    function calculateMonthlyROI(roiFinal, dureeEnMois) {
+      return Math.pow(1 + roiFinal / 100, 1 / dureeEnMois) - 1;
+    }
+
    /**
     * Ajoute une ligne d'investissement dans l'interface utilisateur pour Actifs Alternatifs.
     * @param {Object} investment - Objet d'investissement
@@ -194,14 +226,10 @@
     * Met à jour les profits cumulés pour Actifs Alternatifs.
     */
    function updateActifsProfits() {
-     actifsAlternatifsTotalProfit = 0;
      actifsAlternatifsInvestments.forEach(investment => {
-       // Calculer le nombre de mois écoulés
        const monthsElapsed = currentMonthIndex - investment.startMonth;
    
-       // Vérifier si la durée est atteinte
        if (monthsElapsed >= investment.duration * 12) {
-         // Ajouter le profit et retirer l'investissement
          availableMoney += investment.amount + investment.profit;
          // Supprimer l'investissement du tableau
          actifsAlternatifsInvestments = actifsAlternatifsInvestments.filter(inv => inv.id !== investment.id);
@@ -209,9 +237,7 @@
          const li = document.getElementById(`actifs-investment-${investment.id}`);
          if (li) li.remove();
        } else {
-         // Appliquer un rendement mensuel (exemple: 0.5%)
-         const monthlyRate = 0.005;
-         const interestEarned = investment.amount * monthlyRate;
+         const interestEarned = investment.amount * investment.monthlyROI;
          investment.profit += interestEarned;
          actifsAlternatifsTotalProfit += interestEarned;
    
@@ -223,10 +249,7 @@
        }
      });
    
-     // Mettre à jour le total des profits
      calculateActifsTotalProfit();
-   
-     // Sauvegarder les investissements mis à jour
      saveData();
    }
    
@@ -723,11 +746,18 @@
          return;
        }
    
+       const duree = this.durationSelected === 3 ? "3ans" : "7ans";
+       const roiFinal = selectFinalROI(duree);
+       const dureeEnMois = this.durationSelected * 12;
+       const monthlyROI = calculateMonthlyROI(roiFinal, dureeEnMois);
+
        const investment = {
          amount: amount,
          duration: this.durationSelected,
          startMonth: currentMonthIndex,
          profit: 0,
+         roiFinal: roiFinal,
+         monthlyROI: monthlyROI,
          id: Date.now() // Identifiant unique
        };
    
