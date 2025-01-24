@@ -4,413 +4,417 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Objectif Thune - Prototype</title>
+  <meta name="description" content="Objectif Thune - Un jeu éducatif pour apprendre à gérer et investir votre épargne" />
+  <title>Objectif Thune - Jeu d'investissement</title>
+  
+  <!-- Préchargement des ressources critiques -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" as="style">
+  <link rel="preload" href="style.css" as="style">
+  
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
 </head>
 
 <body>
-
-  <!-- Écran d'Introduction -->
-  <div id="intro-screen" class="intro-screen">
-    <div class="intro-content">
-      <h1>Bienvenue dans Objectif Thune</h1>
-      <p>Apprenez à gérer et investir votre argent de manière ludique et interactive. Préparez votre avenir financier dès aujourd'hui !</p>
-      <button id="play-button" class="play-button">Jouer</button>
-    </div>
-  </div>
-
-  <!-- Jeu -->
-  <div class="container hidden" id="game-container">
-    <!-- Dashboard -->
-    <div class="dashboard" data-module="dashboard">
-      <div class="dashboard-section">
-        <div id="current-year">Année X sur Y</div>
+  <main>
+    <!-- Écran d'Introduction -->
+    <section id="intro-screen" class="intro-screen">
+      <div class="intro-content">
+        <h1>Bienvenue dans Objectif Thune</h1>
+        <p>Apprenez à gérer et investir votre argent de manière ludique et interactive. Préparez votre avenir financier dès aujourd'hui !</p>
+        <button id="play-button" class="play-button">Jouer</button>
       </div>
+    </section>
 
-      <div class="dashboard-section">
-        <img src="pictures/Money-box.webp" alt="Money-box" class="dashboard-image">
-      </div>
-
-      <div class="dashboard-section">
-        <h2 class="dashboard-title">Argent Disponible</h2>
-        <div id="available-money" class="dashboard-amount">0 €</div>
-      </div>
-
-      <div class="dashboard-section">
-        <div class="dashboard-toggle-container">
-          <button id="dashboard-toggle-button" class="toggle-button" aria-pressed="true" aria-label="Basculer entre Patrimoine Total et Profit Total">
-            <img src="pictures/down-arrow.png" alt="Toggle View">
-          </button>
-          <h2 id="dashboard-toggle-title" class="dashboard-title">Patrimoine Total</h2>
+    <!-- Jeu Principal -->
+    <section class="container hidden" id="game-container">
+      <!-- Dashboard -->
+      <header class="dashboard" data-module="dashboard" role="banner">
+        <div class="dashboard-section">
+          <div id="current-year">Année X sur Y</div>
         </div>
-        <div id="dashboard-toggle-content" class="dashboard-amount">0 €</div>
 
-      </div>
-    </div>
+        <div class="dashboard-section">
+          <img src="pictures/Money-box.webp" alt="Money-box" class="dashboard-image">
+        </div>
 
-    <!-- Modules d'investissement -->
-    <div class="modules-container" id="modules-container">
+        <div class="dashboard-section">
+          <h2 class="dashboard-title">Argent Disponible</h2>
+          <div id="available-money" class="dashboard-amount">0 €</div>
+        </div>
 
-      <!-- Top Modules (Livret A, Obligations, Actions) -->
-      <div class="top-modules">
-        <!-- Module livret A -->
-        <div class="module" data-module="livretA">
-          <h2>Livret A</h2>
-
-          <div class="toggle-container">
-            <button id="toggle-view-livretA" class="toggle-button active" aria-expanded="true" aria-controls="livretA-toggle-content">
+        <div class="dashboard-section">
+          <div class="dashboard-toggle-container">
+            <button id="dashboard-toggle-button" class="toggle-button" aria-pressed="true" aria-label="Basculer entre Patrimoine Total et Profit Total">
               <img src="pictures/down-arrow.png" alt="Toggle View">
             </button>
-            <div id="livretA-toggle-content" class="toggle-content">
-              <div id="livret-a-amount" class="module-amount active">0 € investis</div>
-              <div id="livret-a-profit" class="module-amount">0 € de profit</div>
-            </div>
+            <h2 id="dashboard-toggle-title" class="dashboard-title">Patrimoine Total</h2>
           </div>
+          <div id="dashboard-toggle-content" class="dashboard-amount">0 €</div>
 
-          <div class="button-group">
-            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Livret A">Investir</button>
-            <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer du Livret A">Retirer</button>
-          </div>
-
-          <div class="action-form hidden" data-action-form="livretA">
-            <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
-            <input type="number" class="action-amount" placeholder="Montant" min="0">
-            <button class="max-button">MAX</button>
-            <button class="confirm-button">Confirmer</button>
-          </div>
         </div>
+      </header>
 
-        <!-- Module obligations -->
-        <div class="module hidden" data-module="obligations">
-          <h2>Obligations</h2>
-          <div id="obligations-amount" class="module-amount active">0 € investis</div>
-          <div class="button-group">
-            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Obligations">Investir</button>
-            <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Obligations">Retirer</button>
-          </div>
-        </div>
+      <!-- Modules d'investissement -->
+      <section class="modules-container" id="modules-container">
 
-        <!-- Module actions (ETF) -->
-        <div class="module hidden" data-module="actions">
-          <h2>Actions</h2>
+        <!-- Top Modules (Livret A, Obligations, Actions) -->
+        <div class="top-modules">
+          <!-- Module livret A -->
+          <div class="module" data-module="livretA">
+            <h2>Livret A</h2>
 
-          <div class="toggle-container">
-            <button id="toggle-view-actions" class="toggle-button active" aria-expanded="true" aria-controls="actions-toggle-content">
-              <img src="pictures/down-arrow.png" alt="Toggle View">
-            </button>
-            <div id="actions-toggle-content" class="toggle-content">
-              <div id="actions-amount" class="module-amount active">0 € investis</div>
-              <div id="actions-profit" class="module-amount">0 € de profit</div>
-            </div>
-          </div>
-
-          <div class="button-group">
-            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actions">Investir</button>
-            <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Actions">Retirer</button>
-          </div>
-
-          <div class="action-form hidden" data-action-form="actions">
-            <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
-            <input type="number" class="action-amount" placeholder="Montant" min="0">
-            <button class="max-button">MAX</button>
-            <button class="confirm-button">Confirmer</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Modules (Résidence Principale, Fonds Immobiliers, Actifs Alternatifs) -->
-      <div class="bottom-modules hidden" id="bottom-modules">
-      <!-- Module résidence principale -->
-        <div class="module" data-module="residencePrincipale">
-          <h2>Résidence Principale</h2>
-
-          <!-- État 1: Non investi -->
-          <div class="residence-state state-1">
-            <div class="info">
-              <p><strong>Surface cible :</strong> <span id="residence-surface">50</span> m²</p>
-              <p><strong>Argent nécessaire :</strong> <span id="residence-argentNecessaire">10 000 €</span></p>
-            </div>
-            <div class="button-group">
-              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Résidence Principale">Investir</button>
-            </div>
-          </div>
-
-          <!-- État 2: Investi -->
-          <div class="residence-state state-2 hidden">
-            <div class="info">
-              <p><strong>Âge :</strong> <span id="residence-age">22</span> ans</p>
-              <p><strong>Taille :</strong> <span id="residence-taille">50</span> m²</p>
-            </div>
             <div class="toggle-container">
-              <button id="toggle-view-residence" class="toggle-button active" aria-expanded="true" aria-controls="residence-toggle-content">
+              <button id="toggle-view-livretA" class="toggle-button active" aria-expanded="true" aria-controls="livretA-toggle-content">
                 <img src="pictures/down-arrow.png" alt="Toggle View">
               </button>
-              <div id="residence-toggle-content" class="toggle-content">
-                <div id="residence-investedAmount" class="module-amount active">10 000 € investis</div>
-                <div id="residence-profit" class="module-amount">0 € de profit</div>
+              <div id="livretA-toggle-content" class="toggle-content">
+                <div id="livret-a-amount" class="module-amount active">0 € investis</div>
+                <div id="livret-a-profit" class="module-amount">0 € de profit</div>
               </div>
             </div>
+
             <div class="button-group">
-              <button class="action-button sell-button" data-action="sell" aria-label="Vendre Résidence Principale">Vendre</button>
+              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Livret A">Investir</button>
+              <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer du Livret A">Retirer</button>
             </div>
-          </div>
-        </div>
 
-        <!-- Module Fonds immobiliers -->
-        <div class="module hidden" data-module="fondsImmobiliers">
-          <h2>Fonds Immobiliers</h2>
-          <div id="fondsImmobiliers-amount" class="module-amount active">0 € investis</div>
-          <div class="button-group">
-            <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Fonds Immobiliers">Investir</button>
-            <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Fonds Immobiliers">Retirer</button>
-          </div>
-        </div>
-            
-        <!-- Module Actifs alternatifs -->
-        <div class="module hidden" data-module="actifsAlternatifs">
-          <h2>Actifs Alternatifs</h2>
-
-          <!-- État 1: Par défaut -->
-          <div class="actifs-state-1">
-            <div class="info">
-              <ul id="actifs-investedAmounts">
-                <!-- Les investissements sont ajoutés ici dynamiquement -->
-              </ul>
-              <p><strong>Profits Cumulés :</strong> <span id="actifs-totalProfit">0 €</span></p>
-            </div>
-            <div class="button-group">
-              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actifs Alternatifs">Investir</button>
-            </div>
-          </div>
-
-          <!-- État 2: Choix de la durée -->
-          <div class="actifs-state-2 hidden">
-            <div class="button-group duration-buttons">
-              <button class="duration-button" data-duration="3" aria-pressed="false">3 ans</button>
-              <button class="duration-button" data-duration="7" aria-pressed="false">7 ans</button>
-            </div>
-            <div class="action-form hidden" data-action-form="actifsAlternatifs">
+            <div class="action-form hidden" data-action-form="livretA">
               <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
-              <input type="number" class="action-amount" placeholder="Montant (min 10 000 €)" min="10000" step="1000">
+              <input type="number" class="action-amount" placeholder="Montant" min="0">
+              <button class="max-button">MAX</button>
+              <button class="confirm-button">Confirmer</button>
+            </div>
+          </div>
+
+          <!-- Module obligations -->
+          <div class="module hidden" data-module="obligations">
+            <h2>Obligations</h2>
+            <div id="obligations-amount" class="module-amount active">0 € investis</div>
+            <div class="button-group">
+              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Obligations">Investir</button>
+              <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Obligations">Retirer</button>
+            </div>
+          </div>
+
+          <!-- Module actions (ETF) -->
+          <div class="module hidden" data-module="actions">
+            <h2>Actions</h2>
+
+            <div class="toggle-container">
+              <button id="toggle-view-actions" class="toggle-button active" aria-expanded="true" aria-controls="actions-toggle-content">
+                <img src="pictures/down-arrow.png" alt="Toggle View">
+              </button>
+              <div id="actions-toggle-content" class="toggle-content">
+                <div id="actions-amount" class="module-amount active">0 € investis</div>
+                <div id="actions-profit" class="module-amount">0 € de profit</div>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actions">Investir</button>
+              <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Actions">Retirer</button>
+            </div>
+
+            <div class="action-form hidden" data-action-form="actions">
+              <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
+              <input type="number" class="action-amount" placeholder="Montant" min="0">
               <button class="max-button">MAX</button>
               <button class="confirm-button">Confirmer</button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-  </div>
+        <!-- Bottom Modules (Résidence Principale, Fonds Immobiliers, Actifs Alternatifs) -->
+        <div class="bottom-modules hidden" id="bottom-modules">
+        <!-- Module résidence principale -->
+          <div class="module" data-module="residencePrincipale">
+            <h2>Résidence Principale</h2>
+
+            <!-- État 1: Non investi -->
+            <div class="residence-state state-1">
+              <div class="info">
+                <p><strong>Surface cible :</strong> <span id="residence-surface">50</span> m²</p>
+                <p><strong>Argent nécessaire :</strong> <span id="residence-argentNecessaire">10 000 €</span></p>
+              </div>
+              <div class="button-group">
+                <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Résidence Principale">Investir</button>
+              </div>
+            </div>
+
+            <!-- État 2: Investi -->
+            <div class="residence-state state-2 hidden">
+              <div class="info">
+                <p><strong>Âge :</strong> <span id="residence-age">22</span> ans</p>
+                <p><strong>Taille :</strong> <span id="residence-taille">50</span> m²</p>
+              </div>
+              <div class="toggle-container">
+                <button id="toggle-view-residence" class="toggle-button active" aria-expanded="true" aria-controls="residence-toggle-content">
+                  <img src="pictures/down-arrow.png" alt="Toggle View">
+                </button>
+                <div id="residence-toggle-content" class="toggle-content">
+                  <div id="residence-investedAmount" class="module-amount active">10 000 € investis</div>
+                  <div id="residence-profit" class="module-amount">0 € de profit</div>
+                </div>
+              </div>
+              <div class="button-group">
+                <button class="action-button sell-button" data-action="sell" aria-label="Vendre Résidence Principale">Vendre</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Module Fonds immobiliers -->
+          <div class="module hidden" data-module="fondsImmobiliers">
+            <h2>Fonds Immobiliers</h2>
+            <div id="fondsImmobiliers-amount" class="module-amount active">0 € investis</div>
+            <div class="button-group">
+              <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Fonds Immobiliers">Investir</button>
+              <button class="action-button withdraw-button" data-action="withdraw" aria-label="Retirer des Fonds Immobiliers">Retirer</button>
+            </div>
+          </div>
+            
+          <!-- Module Actifs alternatifs -->
+          <div class="module hidden" data-module="actifsAlternatifs">
+            <h2>Actifs Alternatifs</h2>
+
+            <!-- État 1: Par défaut -->
+            <div class="actifs-state-1">
+              <div class="info">
+                <ul id="actifs-investedAmounts">
+                  <!-- Les investissements sont ajoutés ici dynamiquement -->
+                </ul>
+                <p><strong>Profits Cumulés :</strong> <span id="actifs-totalProfit">0 €</span></p>
+              </div>
+              <div class="button-group">
+                <button class="action-button invest-button" data-action="invest" aria-label="Investir dans Actifs Alternatifs">Investir</button>
+              </div>
+            </div>
+
+            <!-- État 2: Choix de la durée -->
+            <div class="actifs-state-2 hidden">
+              <div class="button-group duration-buttons">
+                <button class="duration-button" data-duration="3" aria-pressed="false">3 ans</button>
+                <button class="duration-button" data-duration="7" aria-pressed="false">7 ans</button>
+              </div>
+              <div class="action-form hidden" data-action-form="actifsAlternatifs">
+                <span class="close-icon" role="button" aria-label="Fermer">&times;</span>
+                <input type="number" class="action-amount" placeholder="Montant (min 10 000 €)" min="10000" step="1000">
+                <button class="max-button">MAX</button>
+                <button class="confirm-button">Confirmer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- Écran de Fin -->
+    <section id="end-screen" class="intro-screen hidden" aria-label="Résultats du jeu">
+      <div class="intro-content">
+        <h1>Bravo !</h1>
+        <p id="end-message"></p>
+        <div class="end-stats">
+          <p>Années Jouées : <span id="stats-years"></span></p>
+          <p>Argent Total : <span id="stats-totalMoney"></span> €</p>
+          <p>Livret A : <span id="stats-livretA"></span> €</p>
+          <p>Actions : <span id="stats-actions"></span> €</p>
+          <p>Obligations : <span id="stats-obligations"></span> €</p>
+          <p>Résidence Principale : <span id="stats-residence"></span> €</p>
+          <p>Fonds Immobiliers : <span id="stats-fondsImmobiliers"></span> €</p>
+          <p>Actifs Alternatifs Profit : <span id="stats-actifsProfit"></span> €</p>
+        </div>
+        <button id="restart-button" class="play-button">Rejouer</button>
+      </div>
+    </section>  
+  </main>
 
   <!-- Overlays -->
-
-  <!-- Overlay pour le Module Livret A -->
-  <div id="overlay-livretA" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <!-- Messages -->
-        <div class="overlay-message active">
-          <h3>Découverte du Livret A</h3>
-          <p>Le Livret A est un placement sûr et accessible, idéal pour commencer à épargner.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages du Livret A</h3>
-          <p>Profitez d'un taux d'intérêt avantageux et d'une fiscalité avantageuse.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Comment Investir dans le Livret A</h3>
-          <p>Il est simple d'investir : déposez votre argent et suivez la croissance de votre épargne.</p>
-        </div>
-        <!-- Boutons de Navigation -->
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Overlay pour le Module Obligations -->
-  <div id="overlay-obligations" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <div class="overlay-message active">
-          <h3>Découverte des Obligations</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages des Obligations</h3>
-          <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Comment Investir</h3>
-          <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
-        </div>
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
+  <aside id="overlays-container">
+    <!-- Overlay Livret A -->
+    <div id="overlay-livretA" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="livretA-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="livretA-title">Découverte du Livret A</h3>
+            <p>Le Livret A est un placement sûr et accessible, idéal pour commencer à épargner.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages du Livret A</h3>
+            <p>Profitez d'un taux d'intérêt avantageux et d'une fiscalité avantageuse.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Comment Investir dans le Livret A</h3>
+            <p>Il est simple d'investir : déposez votre argent et suivez la croissance de votre épargne.</p>
+          </div>
+          <!-- Boutons de Navigation -->
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay pour le Module Actions -->
-  <div id="overlay-actions" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <!-- Messages -->
-        <div class="overlay-message active">
-          <h3>Découverte des Actions</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages des Actions</h3>
-          <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Risques des Actions</h3>
-          <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
-        </div>
-
-        <!-- Flèches de Navigation -->
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-
-        <!-- Bouton "J'ai compris" -->
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
+    <!-- Overlay Obligations -->
+    <div id="overlay-obligations" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="obligations-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="obligations-title">Découverte des Obligations</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages des Obligations</h3>
+            <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Comment Investir</h3>
+            <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
+          </div>
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay pour le Module Résidence Principale -->
-  <div id="overlay-residencePrincipale" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <!-- Messages -->
-        <div class="overlay-message active">
-          <h3>Investissement dans la Résidence Principale</h3>
-          <p>Posséder une résidence principale est un pilier de votre patrimoine immobilier.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages de la Résidence Principale</h3>
-          <p>Stabilité, valorisation à long terme et avantages fiscaux.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Comment Investir dans une Résidence Principale</h3>
-          <p>Investissez dans votre avenir en acquérant une propriété adaptée à vos besoins.</p>
-        </div>
-        <!-- Boutons de Navigation -->
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
+    <!-- Overlay Actions -->
+    <div id="overlay-actions" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="actions-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="actions-title">Découverte des Actions</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages des Actions</h3>
+            <p>Curabitur non nulla sit amet nisl tempus convallis quis ac lectus. Nulla porttitor accumsan tincidunt.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Risques des Actions</h3>
+            <p>Pellentesque in ipsum id orci porta dapibus. Donec sollicitudin molestie malesuada.</p>
+          </div>
+
+          <!-- Flèches de Navigation -->
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+
+          <!-- Bouton "J'ai compris" -->
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay pour le Module Fonds Immobiliers -->
-  <div id="overlay-fondsImmobiliers" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <!-- Messages -->
-        <div class="overlay-message active">
-          <h3>Introduction aux Fonds Immobiliers</h3>
-          <p>Les fonds immobiliers vous permettent d'investir dans l'immobilier sans acheter de propriété directement.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages des Fonds Immobiliers</h3>
-          <p>Diversification, liquidité et gestion professionnelle de vos investissements.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Comment Investir dans les Fonds Immobiliers</h3>
-          <p>Sélectionnez un fonds, investissez votre capital et suivez la performance de votre investissement.</p>
-        </div>
-        <!-- Boutons de Navigation -->
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
+    <!-- Overlay Résidence Principale -->
+    <div id="overlay-residencePrincipale" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="residence-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="residence-title">Investissement dans la Résidence Principale</h3>
+            <p>Posséder une résidence principale est un pilier de votre patrimoine immobilier.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages de la Résidence Principale</h3>
+            <p>Stabilité, valorisation à long terme et avantages fiscaux.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Comment Investir dans une Résidence Principale</h3>
+            <p>Investissez dans votre avenir en acquérant une propriété adaptée à vos besoins.</p>
+          </div>
+          <!-- Boutons de Navigation -->
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay pour le Module Actifs Alternatifs -->
-  <div id="overlay-actifsAlternatifs" class="overlay hidden">
-    <div class="overlay-container">
-      <div class="overlay-content">
-        <!-- Messages -->
-        <div class="overlay-message active">
-          <h3>Découverte des Actifs Alternatifs</h3>
-          <p>Les actifs alternatifs incluent des investissements tels que les matières premières, les cryptomonnaies, etc.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Avantages des Actifs Alternatifs</h3>
-          <p>Diversification supplémentaire, potentiels de rendement élevés et couverture contre l'inflation.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Risques des Actifs Alternatifs</h3>
-          <p>Volatilité élevée et complexité accrue. Investissez avec prudence et informez-vous bien.</p>
-        </div>
-        <div class="overlay-message">
-          <h3>Comment Investir dans les Actifs Alternatifs</h3>
-          <p>Choisissez vos actifs, investissez selon votre stratégie et surveillez régulièrement vos placements.</p>
-        </div>
-        <!-- Boutons de Navigation -->
-        <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
-        <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
-        <button class="overlay-continue-button hidden">J'ai compris</button>
-        <div class="nav-dots">
-          <span class="nav-dot active"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
-          <span class="nav-dot"></span>
+    <!-- Overlay Fonds Immobiliers -->
+    <div id="overlay-fondsImmobiliers" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="fondsImmobiliers-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="fondsImmobiliers-title">Introduction aux Fonds Immobiliers</h3>
+            <p>Les fonds immobiliers vous permettent d'investir dans l'immobilier sans acheter de propriété directement.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages des Fonds Immobiliers</h3>
+            <p>Diversification, liquidité et gestion professionnelle de vos investissements.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Comment Investir dans les Fonds Immobiliers</h3>
+            <p>Sélectionnez un fonds, investissez votre capital et suivez la performance de votre investissement.</p>
+          </div>
+          <!-- Boutons de Navigation -->
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Ecran de Fin -->
-  <div id="end-screen" class="intro-screen hidden">
-    <div class="intro-content">
-      <h1>Bravo !</h1>
-      <p id="end-message"></p>
-      <div class="end-stats">
-        <p>Années Jouées : <span id="stats-years"></span></p>
-        <p>Argent Total : <span id="stats-totalMoney"></span> €</p>
-        <p>Livret A : <span id="stats-livretA"></span> €</p>
-        <p>Actions : <span id="stats-actions"></span> €</p>
-        <p>Obligations : <span id="stats-obligations"></span> €</p>
-        <p>Résidence Principale : <span id="stats-residence"></span> €</p>
-        <p>Fonds Immobiliers : <span id="stats-fondsImmobiliers"></span> €</p>
-        <p>Actifs Alternatifs Profit : <span id="stats-actifsProfit"></span> €</p>
+    <!-- Overlay Actifs Alternatifs -->
+    <div id="overlay-actifsAlternatifs" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="actifs-title">
+      <div class="overlay-container">
+        <div class="overlay-content">
+          <div class="overlay-message active">
+            <h3 id="actifs-title">Découverte des Actifs Alternatifs</h3>
+            <p>Les actifs alternatifs incluent des investissements tels que les matières premières, les cryptomonnaies, etc.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Avantages des Actifs Alternatifs</h3>
+            <p>Diversification supplémentaire, potentiels de rendement élevés et couverture contre l'inflation.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Risques des Actifs Alternatifs</h3>
+            <p>Volatilité élevée et complexité accrue. Investissez avec prudence et informez-vous bien.</p>
+          </div>
+          <div class="overlay-message">
+            <h3>Comment Investir dans les Actifs Alternatifs</h3>
+            <p>Choisissez vos actifs, investissez selon votre stratégie et surveillez régulièrement vos placements.</p>
+          </div>
+          <!-- Boutons de Navigation -->
+          <button class="nav-button prev-button" aria-label="Précédent">&larr;</button>
+          <button class="nav-button next-button" aria-label="Suivant">&rarr;</button>
+          <button class="overlay-continue-button hidden">J'ai compris</button>
+          <div class="nav-dots">
+            <span class="nav-dot active"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+            <span class="nav-dot"></span>
+          </div>
+        </div>
       </div>
-      <button id="restart-button" class="play-button">Rejouer</button>
     </div>
-  </div>  
-  
-  <script type="module" src="script.js"></script>
+  </aside>
+
+  <!-- Scripts -->
+  <script type="module" src="script.js" defer></script>
 </body>
 </html>

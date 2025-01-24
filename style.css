@@ -74,6 +74,15 @@
   /* Transition */
   --transition-speed: 0.3s;
 
+  /* Variable pour les espacements communs */
+  --spacing-sm: 5px;
+  --spacing-md: 10px;
+  --spacing-lg: 20px;
+  
+  /* Variables pour les border-radius communs */
+  --border-radius-sm: 5px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 10px;
 }
 
 
@@ -138,7 +147,7 @@ body {
   background-color: var(--intro-screen-button-bg-color);
   color: var(--intro-screen-text-color);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   transition: background-color var(--transition-speed);
 }
@@ -227,7 +236,7 @@ body {
   padding: 20px;
   display: flex;
   border: 2px solid var(--module-border-color);
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
   box-shadow: var(--module-shadow-color);
 
   flex: 1 1 200px; /* Flex-grow, Flex-shrink, Flex-basis */
@@ -353,7 +362,7 @@ body {
   color: var(--button-text-color);
   padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
   margin-right: 10px;
   transition: background-color 0.3s ease;
@@ -376,7 +385,7 @@ body {
   max-width: 282px;               /* Optional: Limits the width */
   background-color: var(--action-form-bg-color);
   border: 2px solid var(--module-border-color);
-  border-radius: 6px;
+  border-radius: var(--border-radius-md);
   position: relative;             /* For positioning the close icon */
   box-shadow: var(--form-shadow);
 }
@@ -502,7 +511,7 @@ body {
   .overlay-content {
     background-color: var(--overlay-content-bg-color);
     padding: 30px 40px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
     width: 80%;
     max-width: 600px;
     /*box-shadow: var(--overlay-content-shadow);*/
@@ -565,7 +574,7 @@ body {
     background-color: var(--primary-bittersweet-light);
     color: var(--neutral-white);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius-sm);
     cursor: pointer;
     font-size: 1.1em;
     transition: background-color var(--transition-speed);
@@ -609,7 +618,7 @@ body {
     height: 100%;
     background: rgba(96, 96, 96, 0.5); /* Couleur de filtre ajustée pour une meilleure visibilité */
     z-index: -1;                       /* Sous l'overlay */
-    border-radius: 10px;
+    border-radius: var(--border-radius-lg);
   }
 
   /* Assurez-vous que .modules-container n'a pas un z-index plus élevé que les overlays */
@@ -631,6 +640,9 @@ body {
   }
 
 /* Responsive adjustments */
+@media (max-width: 1024px) {
+}
+
 @media (max-width: 800px) {
   .container {
     flex-direction: column;
@@ -662,4 +674,7 @@ body {
   .action-form {
     max-width: 100%;
   }
+}
+
+@media (max-width: 480px) {
 }
