@@ -4,16 +4,16 @@
 
 export const actifsAlternatifsROIs = {
     "3ans": [
-      { roiFinal: 25, probability: 10 },
-      { roiFinal: 10, probability: 40 },
-      { roiFinal: 0, probability: 20 },
-      { roiFinal: -10, probability: 30 },
+      { roiFinal: -100, probability: 5 },
+      { roiFinal: -30, probability: 45 },
+      { roiFinal: 50, probability: 45 },
+      { roiFinal: 100, probability: 5 },
     ],
     "7ans": [
-      { roiFinal: 50, probability: 10 },
-      { roiFinal: 20, probability: 40 },
-      { roiFinal: 5, probability: 30 },
-      { roiFinal: -15, probability: 20 },
+      { roiFinal: -100, probability: 5 },
+      { roiFinal: -50, probability: 45 },
+      { roiFinal: 100, probability: 45 },
+      { roiFinal: 1000, probability: 5 },
     ],
   };
   
