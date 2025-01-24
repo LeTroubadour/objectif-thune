@@ -13,7 +13,7 @@
    
    // Informations de base
    const initialAge = 22;
-   const totalYears = 12; // Durée de la simulation en années
+   const totalYears = 20; // Durée de la simulation en années
    
    // Indices temporels
    let currentYearIndex = 1;   // 1 = première année
