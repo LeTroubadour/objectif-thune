@@ -98,6 +98,7 @@
    // Dashboard
    const gameContainer = document.getElementById('game-container');
    const currentYearEl = document.getElementById('current-year');
+   const currentAgeEl = document.getElementById('current-age');
    const availableMoneyEl = document.getElementById('available-money');
    const dashboardToggleButton = document.getElementById('dashboard-toggle-button');
    const dashboardToggleTitle = document.getElementById('dashboard-toggle-title');
@@ -257,14 +258,16 @@
     * Met à jour l'interface utilisateur avec les nouvelles valeurs.
     */
    function updateUI() {
-     const age = initialAge + currentYearIndex - 1;
-   
      // Mise à jour du Dashboard
      currentYearEl.innerHTML = `
        <span class="dashboard-title">Année</span>
        <span class="dashboard-amount">${currentYearIndex}</span> 
        <span class="dashboard-title">sur</span> 
        <span class="dashboard-amount">${totalYears}</span>
+     `;
+     const age = initialAge + currentYearIndex - 1;
+     currentAgeEl.innerHTML = `
+       <span class="dashboard-title">${age} ans</span>
      `;
      availableMoneyEl.textContent = `€${availableMoney.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "'")}`;
      updateDashboardToggle();
