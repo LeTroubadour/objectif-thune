@@ -57,6 +57,9 @@
    // Gestion des overlays
    let isOverlayActive = false;
    
+   // Variables globales
+   let isGamePaused = false;
+   
    /* -----------------------------
       Tables de Rendements Mensuels
       ----------------------------- */
@@ -1362,6 +1365,7 @@
     * Met en pause le jeu en arrêtant l'intervalle.
     */
    function pauseGame() {
+     isGamePaused = true;
      clearInterval(gameInterval);
    }
    
@@ -1369,7 +1373,10 @@
     * Reprend le jeu en redémarrant l'intervalle.
     */
    function resumeGame() {
-     startGame();
+     if (isGamePaused) {
+       isGamePaused = false;
+       startGame();
+     }
    }
    
    /* -----------------------------
@@ -1397,7 +1404,6 @@
     * @param {number} speed - Vitesse du jeu en millisecondes
     */
    function handleGameStart(speed) {
-     console.log(speed);
      gameSpeed = speed;
      hideIntroScreen();
      init();
@@ -1465,7 +1471,8 @@
     * Initialise le jeu en chargeant les données et en démarrant l'intervalle de jeu.
     */
    function init() {
-     restartGame();
+    initControlButtons();
+    restartGame();
      /*loadData();
      updateUI();
      startGame();*/
@@ -1473,4 +1480,27 @@
    
    // Appel de l'initialisation de l'intro au chargement de la page
    document.addEventListener('DOMContentLoaded', initIntro);
+   
+   /**
+    * Initialise les boutons de contrôle.
+    */
+   function initControlButtons() {
+     const pauseButton = document.getElementById('pause-button');
+     const playButton = document.getElementById('play-button');
+     
+     // Désactiver le bouton play au début
+     playButton.disabled = true;
+     
+     pauseButton.addEventListener('click', () => {
+       pauseGame();
+       pauseButton.disabled = true;
+       playButton.disabled = false;
+     });
+     
+     playButton.addEventListener('click', () => {
+       resumeGame();
+       playButton.disabled = true;
+       pauseButton.disabled = false;
+     });
+   }
    

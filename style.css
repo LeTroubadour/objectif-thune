@@ -685,3 +685,39 @@ body {
 
 @media (max-width: 480px) {
 }
+
+/* Styles pour les boutons de contrôle */
+.controls {
+  margin-top: auto; /* Pousse la section vers le bas */
+  margin-bottom: 20px;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.control-button {
+  padding: 10px 20px;
+  background-color: var(--primary-bittersweet-light);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.control-button:hover {
+  background-color: var(--primary-bittersweet-dark);
+}
+
+.control-button:disabled {
+  background-color: var(--neutral-dark);
+  cursor: not-allowed;
+}
+
+.button-text {
+  font-size: 1em;
+  font-weight: 600;
+}
