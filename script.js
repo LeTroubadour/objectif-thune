@@ -21,7 +21,8 @@
    
    // Gestion de l'intervalle du jeu
    let gameInterval;
-   
+   let gameSpeed;
+
    // Argent disponible initial
    let availableMoney = 100000;
    let totalWealth = availableMoney;
@@ -1249,7 +1250,7 @@
        checkTimeMilestones();
        updateModulesLayout();
    
-     }, 500); // Intervalle en ms qui représente un mois
+     }, gameSpeed); // Interval en ms qui représente un mois
    }
 
     /* -----------------------------
@@ -1392,9 +1393,12 @@
    }
    
    /**
-    * Gestionnaire de clic pour le bouton "Jouer".
+    * Gestionnaire de clic pour les boutons de jeu.
+    * @param {number} speed - Vitesse du jeu en millisecondes
     */
-   function handlePlayButtonClick() {
+   function handleGameStart(speed) {
+     console.log(speed);
+     gameSpeed = speed;
      hideIntroScreen();
      init();
 
@@ -1402,15 +1406,16 @@
      setTimeout(() => {
        showOverlay(overlayLivretA);
        livretAModule.overlayActivated = true;
-     }, 100); // Petit délai pour assurer que l'interface est prête
-  }
+     }, 100);
+   }
    
    /**
     * Initialisation spécifique pour l'écran d'introduction.
     */
    function initIntro() {
      showIntroScreen();
-     playButton.addEventListener('click', handlePlayButtonClick);
+     document.getElementById('fast-game').addEventListener('click', () => handleGameStart(500));
+     document.getElementById('normal-game').addEventListener('click', () => handleGameStart(2500));
    }
    
    /* -----------------------------

@@ -141,7 +141,14 @@ body {
   color: var(--intro-screen-text-color);
 }
 
+.play-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
 .play-button {
+  width: 150px;
   padding: 15px 30px;
   font-size: 1.1em;
   background-color: var(--intro-screen-button-bg-color);
